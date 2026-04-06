@@ -65,6 +65,8 @@ const defaultAchievements: Achievement[] = [
   { id: 'ten-words', title: 'Начинающий', description: 'Выучите 10 слов', icon: '📖', unlocked: false },
   { id: 'fifty-words', title: 'Первые 50 слов', description: 'Выучите 50 слов', icon: '📚', unlocked: false },
   { id: 'hundred-words', title: 'Сто слов', description: 'Выучите 100 слов', icon: '🏆', unlocked: false },
+  { id: 'two-hundred-words', title: 'Полпути!', description: 'Выучите 200 слов', icon: '🎓', unlocked: false },
+  { id: 'all-words', title: 'Мастер слов', description: 'Выучите все 300 слов', icon: '👑', unlocked: false },
   { id: 'alphabet-master', title: 'Мастер алфавита', description: 'Выучите все буквы алфавита', icon: '🅰️', unlocked: false },
   { id: 'first-lesson', title: 'Студент', description: 'Завершите первый урок грамматики', icon: '✏️', unlocked: false },
   { id: 'grammar-genius', title: 'Грамматический гений', description: 'Завершите все уроки грамматики', icon: '🧠', unlocked: false },
@@ -160,8 +162,8 @@ export const useCzechStore = create<CzechStore>()(
         return learnedWordIds.filter((id) => id.startsWith(categoryId[0] === 'g' && categoryId !== 'grammar' ? 'g' : categoryId[0]));
       },
       getTotalWords: () => {
-        // 200 words across 9 categories
-        return 200;
+        // 300 words across 14 categories
+        return 300;
       },
       getQuizAccuracy: () => {
         const { quizScores } = get();
@@ -190,6 +192,14 @@ export const useCzechStore = create<CzechStore>()(
         const hw = achievements.find((a) => a.id === 'hundred-words');
         if (hw && state.learnedWordIds.length >= 100) hw.unlocked = true;
 
+        // Check two-hundred-words
+        const thw = achievements.find((a) => a.id === 'two-hundred-words');
+        if (thw && state.learnedWordIds.length >= 200) thw.unlocked = true;
+
+        // Check all-words
+        const aw = achievements.find((a) => a.id === 'all-words');
+        if (aw && state.learnedWordIds.length >= 300) aw.unlocked = true;
+
         // Check alphabet-master
         const am = achievements.find((a) => a.id === 'alphabet-master');
         if (am && state.masteredLetterIds.length >= 42) am.unlocked = true;
@@ -217,9 +227,9 @@ export const useCzechStore = create<CzechStore>()(
         // Check all-categories
         const ac = achievements.find((a) => a.id === 'all-categories');
         if (ac) {
-          const prefixes = ['g', 'f', 'fm', 'n', 'c', 't', 'ct', 'tm'];
+          const prefixes = ['g', 'f', 'fm', 'n', 'c', 't', 'ct', 'tm', 'bd', 'an', 'nt', 'cl', 'hm', 'vb'];
           const covered = prefixes.filter((p) => state.learnedWordIds.some((id) => id.startsWith(p)));
-          if (covered.length >= 8) ac.unlocked = true;
+          if (covered.length >= 14) ac.unlocked = true;
         }
 
         return achievements;

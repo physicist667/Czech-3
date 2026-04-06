@@ -93,6 +93,46 @@ export const multipleChoiceQuestions: MultipleChoiceQuestion[] = [
   { id: 'mc38', czech: 'Dvanáct', correctAnswer: 'Двенадцать', options: ['Одиннадцать', 'Двенадцать', 'Тринадцать', 'Десять'], category: 'numbers' },
   { id: 'mc39', czech: 'Sto', correctAnswer: 'Сто', options: ['Десять', 'Пятьдесят', 'Сто', 'Тысяча'], category: 'numbers' },
   { id: 'mc40', czech: 'Deset', correctAnswer: 'Десять', options: ['Восемь', 'Девять', 'Десять', 'Одиннадцать'], category: 'numbers' },
+  // Body
+  { id: 'mc41', czech: 'Hlava', correctAnswer: 'Голова', options: ['Рука', 'Голова', 'Нога', 'Шея'], category: 'body' },
+  { id: 'mc42', czech: 'Srdce', correctAnswer: 'Сердце', options: ['Лёгкие', 'Сердце', 'Желудок', 'Печень'], category: 'body' },
+  { id: 'mc43', czech: 'Ruka', correctAnswer: 'Рука', options: ['Нога', 'Палец', 'Рука', 'Плечо'], category: 'body' },
+  { id: 'mc44', czech: 'Zuby', correctAnswer: 'Зубы', options: ['Губы', 'Язык', 'Зубы', 'Уши'], category: 'body' },
+  { id: 'mc45', czech: 'Krk', correctAnswer: 'Шея', options: ['Голова', 'Спина', 'Шея', 'Грудь'], category: 'body' },
+  // Animals
+  { id: 'mc46', czech: 'Pes', correctAnswer: 'Собака', options: ['Кошка', 'Собака', 'Лошадь', 'Корова'], category: 'animals' },
+  { id: 'mc47', czech: 'Kočka', correctAnswer: 'Кошка', options: ['Собака', 'Мышь', 'Кошка', 'Хорёк'], category: 'animals' },
+  { id: 'mc48', czech: 'Kůň', correctAnswer: 'Лошадь', options: ['Осёл', 'Лошадь', 'Корова', 'Свинья'], category: 'animals' },
+  { id: 'mc49', czech: 'Vlk', correctAnswer: 'Волк', options: ['Медведь', 'Волк', 'Лиса', 'Заяц'], category: 'animals' },
+  { id: 'mc50', czech: 'Medvěd', correctAnswer: 'Медведь', options: ['Волк', 'Медведь', 'Рысь', 'Барсук'], category: 'animals' },
+  { id: 'mc51', czech: 'Liška', correctAnswer: 'Лиса', options: ['Заяц', 'Белка', 'Лиса', 'Выдра'], category: 'animals' },
+  { id: 'mc52', czech: 'Pták', correctAnswer: 'Птица', options: ['Рыба', 'Насекомое', 'Птица', 'Змея'], category: 'animals' },
+  // Nature
+  { id: 'mc53', czech: 'Strom', correctAnswer: 'Дерево', options: ['Куст', 'Дерево', 'Цветок', 'Гриб'], category: 'nature' },
+  { id: 'mc54', czech: 'Hora', correctAnswer: 'Гора', options: ['Холм', 'Гора', 'Долина', 'Равнина'], category: 'nature' },
+  { id: 'mc55', czech: 'Déšť', correctAnswer: 'Дождь', options: ['Снег', 'Дождь', 'Град', 'Туман'], category: 'nature' },
+  { id: 'mc56', czech: 'Slunce', correctAnswer: 'Солнце', options: ['Луна', 'Звезда', 'Солнце', 'Облако'], category: 'nature' },
+  { id: 'mc57', czech: 'Moře', correctAnswer: 'Море', options: ['Озеро', 'Река', 'Море', 'Океан'], category: 'nature' },
+  { id: 'mc58', czech: 'Les', correctAnswer: 'Лес', options: ['Поле', 'Лес', 'Парк', 'Сад'], category: 'nature' },
+  // Clothing
+  { id: 'mc59', czech: 'Košile', correctAnswer: 'Рубашка', options: ['Футболка', 'Рубашка', 'Свитер', 'Пиджак'], category: 'clothing' },
+  { id: 'mc60', czech: 'Kabát', correctAnswer: 'Пальто', options: ['Куртка', 'Пальто', 'Плащ', 'Костюм'], category: 'clothing' },
+  { id: 'mc61', czech: 'Boty', correctAnswer: 'Ботинки', options: ['Туфли', 'Ботинки', 'Сапоги', 'Кроссовки'], category: 'clothing' },
+  { id: 'mc62', czech: 'Bunda', correctAnswer: 'Куртка', options: ['Пальто', 'Куртка', 'Жилет', 'Плащ'], category: 'clothing' },
+  { id: 'mc63', czech: 'Čepice', correctAnswer: 'Шапка', options: ['Шарф', 'Шапка', 'Перчатки', 'Кепка'], category: 'clothing' },
+  // Home
+  { id: 'mc64', czech: 'Stůl', correctAnswer: 'Стол', options: ['Стул', 'Стол', 'Шкаф', 'Диван'], category: 'home' },
+  { id: 'mc65', czech: 'Postel', correctAnswer: 'Кровать', options: ['Диван', 'Кровать', 'Кушетка', 'Тахта'], category: 'home' },
+  { id: 'mc66', czech: 'Okno', correctAnswer: 'Окно', options: ['Дверь', 'Окно', 'Стена', 'Потолок'], category: 'home' },
+  { id: 'mc67', czech: 'Lednice', correctAnswer: 'Холодильник', options: ['Плита', 'Холодильник', 'Посудомойка', 'Духовка'], category: 'home' },
+  { id: 'mc68', czech: 'Klíč', correctAnswer: 'Ключ', options: ['Замок', 'Ключ', 'Дверь', 'Засов'], category: 'home' },
+  // Verbs
+  { id: 'mc69', czech: 'Jíst', correctAnswer: 'Есть (кушать)', options: ['Пить', 'Есть (кушать)', 'Спать', 'Гулять'], category: 'verbs' },
+  { id: 'mc70', czech: 'Číst', correctAnswer: 'Читать', options: ['Писать', 'Слушать', 'Читать', 'Говорить'], category: 'verbs' },
+  { id: 'mc71', czech: 'Mluvit', correctAnswer: 'Говорить', options: ['Молчать', 'Кричать', 'Говорить', 'Шептать'], category: 'verbs' },
+  { id: 'mc72', czech: 'Dělat', correctAnswer: 'Делать', options: ['Смотреть', 'Делать', 'Думать', 'Ждать'], category: 'verbs' },
+  { id: 'mc73', czech: 'Běžet', correctAnswer: 'Бежать', options: ['Идти', 'Бежать', 'Прыгать', 'Летать'], category: 'verbs' },
+  { id: 'mc74', czech: 'Vidět', correctAnswer: 'Видеть', options: ['Слышать', 'Чувствовать', 'Видеть', 'Знать'], category: 'verbs' },
 ];
 
 export const fillBlankQuestions: FillBlankQuestion[] = [
@@ -122,6 +162,27 @@ export const fillBlankQuestions: FillBlankQuestion[] = [
   { id: 'fb20', sentence: 'Vlasy jsou černé.', sentenceWithBlank: 'Vlasy jsou ____.', correctAnswer: 'černé', options: ['bílé', 'černé', 'šedé', 'růžové'], category: 'colors', hint: 'Самый тёмный цвет' },
   { id: 'fb21', sentence: 'Petře, pojď sem!', sentenceWithBlank: '____, pojď sem!', correctAnswer: 'Petře', options: ['Petr', 'Petře', 'Petra', 'Petru'], category: 'grammar', hint: 'Звательный падеж (Vokativ)' },
   { id: 'fb22', sentence: 'Píšu perem.', sentenceWithBlank: 'Píšu ____.', correctAnswer: 'perem', options: ['pero', 'pera', 'perem', 'peru'], category: 'grammar', hint: 'Инструменталь (Творительный п.)' },
+  // Body
+  { id: 'fb23', sentence: 'Bolí mě hlava.', sentenceWithBlank: 'Bolí mě ____.', correctAnswer: 'hlava', options: ['ruka', 'hlava', 'noha', 'záda'], category: 'body', hint: 'Часть тела сверху' },
+  { id: 'fb24', sentence: 'Čistím si zuby každý den.', sentenceWithBlank: 'Čistím si ____ každý den.', correctAnswer: 'zuby', options: ['vlasy', 'zuby', 'uši', 'ruce'], category: 'body', hint: 'Во рту' },
+  { id: 'fb25', sentence: 'Sport je dobrý pro srdce.', sentenceWithBlank: 'Sport je dobrý pro ____.', correctAnswer: 'srdce', options: ['plíce', 'srdce', 'žaludek', 'mozek'], category: 'body', hint: 'Основной орган кровообращения' },
+  // Animals
+  { id: 'fb26', sentence: 'Můj pes je velmi přátelský.', sentenceWithBlank: 'Můj ____ je velmi přátelský.', correctAnswer: 'pes', options: ['pes', 'kocour', 'koně', 'pták'], category: 'animals', hint: 'Домашнее животное' },
+  { id: 'fb27', sentence: 'Pták zpívá na stromě.', sentenceWithBlank: '____ zpívá na stromě.', correctAnswer: 'pták', options: ['pták', 'květina', 'list', 'vítr'], category: 'animals', hint: 'Летающее существо' },
+  { id: 'fb28', sentence: 'Včela dělá med.', sentenceWithBlank: '____ dělá med.', correctAnswer: 'včela', options: ['včela', 'mravenec', 'motýl', 'beruška'], category: 'animals', hint: 'Насекомое, производит мёд' },
+  // Nature
+  { id: 'fb29', sentence: 'Slunce svítí jasně.', sentenceWithBlank: '____ svítí jasně.', correctAnswer: 'Slunce', options: ['Měsíc', 'Slunce', 'Hvězda', 'Lampa'], category: 'nature', hint: 'Днём на небе' },
+  { id: 'fb30', sentence: 'V zimě padá sníh.', sentenceWithBlank: 'V zimě padá ____.', correctAnswer: 'sníh', options: ['déšť', 'sníh', 'kroupy', 'mlha'], category: 'nature', hint: 'Белый, холодный' },
+  { id: 'fb31', sentence: 'Řeka protéká městem.', sentenceWithBlank: '____ protéká městem.', correctAnswer: 'Řeka', options: ['Cesta', 'Řeka', 'Ulice', 'Nádraží'], category: 'nature', hint: 'Водоём' },
+  // Home
+  { id: 'fb32', sentence: 'Na stole stojí váza.', sentenceWithBlank: 'Na ____ stojí váza.', correctAnswer: 'stole', options: ['židli', 'stole', 'posteli', 'okně'], category: 'home', hint: 'Мебель для работы и еды' },
+  { id: 'fb33', sentence: 'V lednici je mléko a sýr.', sentenceWithBlank: 'V ____ je mléko a sýr.', correctAnswer: 'lednici', options: ['lednici', 'truhle', 'skříni', 'krabici'], category: 'home', hint: 'Охлаждает продукты' },
+  // Clothing
+  { id: 'fb34', sentence: 'V zimě nosím teplý kabát.', sentenceWithBlank: 'V zimě nosím teplý ____.', correctAnswer: 'kabát', options: ['kabát', 'tričko', 'šaty', 'plavky'], category: 'clothing', hint: 'Верхняя одежда' },
+  { id: 'fb35', sentence: 'Na ruce mám rukavice.', sentenceWithBlank: 'Na ruce mám ____.', correctAnswer: 'rukavice', options: ['rukavice', 'ponožky', 'boty', 'čepici'], category: 'clothing', hint: 'Для рук зимой' },
+  // Verbs
+  { id: 'fb36', sentence: 'Učím se česky každý den.', sentenceWithBlank: 'Učím se ____ každý den.', correctAnswer: 'česky', options: ['česky', 'anglicky', 'francouzsky', 'německy'], category: 'verbs', hint: 'Язык Чехии' },
+  { id: 'fb37', sentence: 'Pracuji v bankě.', sentenceWithBlank: '____ v bankě.', correctAnswer: 'Pracuji', options: ['Studuji', 'Pracuji', 'Bydlím', 'Odpočívám'], category: 'verbs', hint: 'Трудовая деятельность' },
 ];
 
 export const matchingSets: MatchingSet[] = [
@@ -205,6 +266,86 @@ export const matchingSets: MatchingSet[] = [
       { czech: 'Letiště', russian: 'Аэропорт' },
     ],
   },
+  {
+    id: 'ms6',
+    title: 'Животные',
+    pairs: [
+      { czech: 'Pes', russian: 'Собака' },
+      { czech: 'Kočka', russian: 'Кошка' },
+      { czech: 'Kůň', russian: 'Лошадь' },
+      { czech: 'Kráva', russian: 'Корова' },
+      { czech: 'Prase', russian: 'Свинья' },
+      { czech: 'Ovce', russian: 'Овца' },
+      { czech: 'Pták', russian: 'Птица' },
+      { czech: 'Vlk', russian: 'Волк' },
+      { czech: 'Medvěd', russian: 'Медведь' },
+      { czech: 'Liška', russian: 'Лиса' },
+    ],
+  },
+  {
+    id: 'ms7',
+    title: 'Природа',
+    pairs: [
+      { czech: 'Strom', russian: 'Дерево' },
+      { czech: 'Květina', russian: 'Цветок' },
+      { czech: 'Řeka', russian: 'Река' },
+      { czech: 'Hora', russian: 'Гора' },
+      { czech: 'Moře', russian: 'Море' },
+      { czech: 'Les', russian: 'Лес' },
+      { czech: 'Slunce', russian: 'Солнце' },
+      { czech: 'Měsíc', russian: 'Луна' },
+      { czech: 'Déšť', russian: 'Дождь' },
+      { czech: 'Sníh', russian: 'Снег' },
+    ],
+  },
+  {
+    id: 'ms8',
+    title: 'Одежда',
+    pairs: [
+      { czech: 'Košile', russian: 'Рубашка' },
+      { czech: 'Kalhoty', russian: 'Брюки' },
+      { czech: 'Šaty', russian: 'Платье' },
+      { czech: 'Kabát', russian: 'Пальто' },
+      { czech: 'Boty', russian: 'Ботинки' },
+      { czech: 'Čepice', russian: 'Шапка' },
+      { czech: 'Rukavice', russian: 'Перчатки' },
+      { czech: 'Bunda', russian: 'Куртка' },
+      { czech: 'Mikina', russian: 'Толстовка' },
+      { czech: 'Taška', russian: 'Сумка' },
+    ],
+  },
+  {
+    id: 'ms9',
+    title: 'Дом и быт',
+    pairs: [
+      { czech: 'Stůl', russian: 'Стол' },
+      { czech: 'Židle', russian: 'Стул' },
+      { czech: 'Postel', russian: 'Кровать' },
+      { czech: 'Okno', russian: 'Окно' },
+      { czech: 'Dveře', russian: 'Дверь' },
+      { czech: 'Kuchyně', russian: 'Кухня' },
+      { czech: 'Koupelna', russian: 'Ванная' },
+      { czech: 'Lednice', russian: 'Холодильник' },
+      { czech: 'Klíč', russian: 'Ключ' },
+      { czech: 'Hodiny', russian: 'Часы' },
+    ],
+  },
+  {
+    id: 'ms10',
+    title: 'Глаголы',
+    pairs: [
+      { czech: 'Jít', russian: 'Идти' },
+      { czech: 'Běžet', russian: 'Бежать' },
+      { czech: 'Jíst', russian: 'Есть (кушать)' },
+      { czech: 'Pít', russian: 'Пить' },
+      { czech: 'Spát', russian: 'Спать' },
+      { czech: 'Číst', russian: 'Читать' },
+      { czech: 'Psát', russian: 'Писать' },
+      { czech: 'Mluvit', russian: 'Говорить' },
+      { czech: 'Vidět', russian: 'Видеть' },
+      { czech: 'Dělat', russian: 'Делать' },
+    ],
+  },
 ];
 
 export const sentenceBuildingExercises: SentenceBuildingExercise[] = [
@@ -222,6 +363,26 @@ export const sentenceBuildingExercises: SentenceBuildingExercise[] = [
   { id: 'sb12', correctSentence: 'Mluví česky a rusky.', translation: 'Он говорит по-чешски и по-русски.', words: ['Mluví', 'česky', 'a', 'rusky', '.'], category: 'grammar' },
   { id: 'sb13', correctSentence: 'Kde je nádraží?', translation: 'Где вокзал?', words: ['Kde', 'je', 'nádraží', '?'], category: 'grammar' },
   { id: 'sb14', correctSentence: 'Nerozumím česky.', translation: 'Я не понимаю по-чешски.', words: ['Nerozumím', 'česky', '.'], category: 'grammar' },
+  // Body
+  { id: 'sb15', correctSentence: 'Bolí mě hlava.', translation: 'У меня болит голова.', words: ['Bolí', 'mě', 'hlava', '.'], category: 'body' },
+  { id: 'sb16', correctSentence: 'Mám zdravé srdce.', translation: 'У меня здоровое сердце.', words: ['Mám', 'zdravé', 'srdce', '.'], category: 'body' },
+  // Animals
+  { id: 'sb17', correctSentence: 'Můj pes je velký.', translation: 'Моя собака большая.', words: ['Můj', 'pes', 'je', 'velký', '.'], category: 'animals' },
+  { id: 'sb18', correctSentence: 'Kočka spí na gauči.', translation: 'Кошка спит на диване.', words: ['Kočka', 'spí', 'na', 'gauči', '.'], category: 'animals' },
+  // Nature
+  { id: 'sb19', correctSentence: 'Slunce svítí jasně.', translation: 'Солнце светит ярко.', words: ['Slunce', 'svítí', 'jasně', '.'], category: 'nature' },
+  { id: 'sb20', correctSentence: 'V zimě padá sníh.', translation: 'Зимой падает снег.', words: ['V', 'zimě', 'padá', 'sníh', '.'], category: 'nature' },
+  // Home
+  { id: 'sb21', correctSentence: 'Dveře jsou zavřené.', translation: 'Двери закрыты.', words: ['Dveře', 'jsou', 'zavřené', '.'], category: 'home' },
+  { id: 'sb22', correctSentence: 'Na stole je váza.', translation: 'На столе стоит ваза.', words: ['Na', 'stole', 'je', 'váza', '.'], category: 'home' },
+  // Clothing
+  { id: 'sb23', correctSentence: 'Mám nové boty.', translation: 'У меня новые ботинки.', words: ['Mám', 'nové', 'boty', '.'], category: 'clothing' },
+  { id: 'sb24', correctSentence: 'V zimě nosím čepici.', translation: 'Зимой я ношу шапку.', words: ['V', 'zimě', 'nosím', 'čepici', '.'], category: 'clothing' },
+  // Verbs
+  { id: 'sb25', correctSentence: 'Chci jíst.', translation: 'Я хочу есть.', words: ['Chci', 'jíst', '.'], category: 'verbs' },
+  { id: 'sb26', correctSentence: 'Musím jít domů.', translation: 'Мне нужно идти домой.', words: ['Musím', 'jít', 'domů', '.'], category: 'verbs' },
+  { id: 'sb27', correctSentence: 'Učím se česky.', translation: 'Я учу чешский.', words: ['Učím', 'se', 'česky', '.'], category: 'verbs' },
+  { id: 'sb28', correctSentence: 'Vidím velký dům.', translation: 'Я вижу большой дом.', words: ['Vidím', 'velký', 'dům', '.'], category: 'verbs' },
 ];
 
 export const trueFalseQuestions: TrueFalseQuestion[] = [
@@ -267,4 +428,32 @@ export const trueFalseQuestions: TrueFalseQuestion[] = [
   { id: 'tf33', czech: 'Deset', russian: 'Десять', isCorrect: true, correctRussian: 'Десять', category: 'numbers' },
   { id: 'tf34', czech: 'Sedm', russian: 'Семь', isCorrect: true, correctRussian: 'Семь', category: 'numbers' },
   { id: 'tf35', czech: 'Devět', russian: 'Восемь', isCorrect: false, correctRussian: 'Девять', category: 'numbers' },
+  // Body
+  { id: 'tf36', czech: 'Hlava', russian: 'Голова', isCorrect: true, correctRussian: 'Голова', category: 'body' },
+  { id: 'tf37', czech: 'Srdce', russian: 'Печень', isCorrect: false, correctRussian: 'Сердце', category: 'body' },
+  { id: 'tf38', czech: 'Ruka', russian: 'Рука', isCorrect: true, correctRussian: 'Рука', category: 'body' },
+  { id: 'tf39', czech: 'Krk', russian: 'Колено', isCorrect: false, correctRussian: 'Шея', category: 'body' },
+  // Animals
+  { id: 'tf40', czech: 'Pes', russian: 'Собака', isCorrect: true, correctRussian: 'Собака', category: 'animals' },
+  { id: 'tf41', czech: 'Kůň', russian: 'Корова', isCorrect: false, correctRussian: 'Лошадь', category: 'animals' },
+  { id: 'tf42', czech: 'Medvěd', russian: 'Медведь', isCorrect: true, correctRussian: 'Медведь', category: 'animals' },
+  { id: 'tf43', czech: 'Liška', russian: 'Волк', isCorrect: false, correctRussian: 'Лиса', category: 'animals' },
+  // Nature
+  { id: 'tf44', czech: 'Déšť', russian: 'Дождь', isCorrect: true, correctRussian: 'Дождь', category: 'nature' },
+  { id: 'tf45', czech: 'Slunce', russian: 'Луна', isCorrect: false, correctRussian: 'Солнце', category: 'nature' },
+  { id: 'tf46', czech: 'Les', russian: 'Парк', isCorrect: false, correctRussian: 'Лес', category: 'nature' },
+  { id: 'tf47', czech: 'Moře', russian: 'Море', isCorrect: true, correctRussian: 'Море', category: 'nature' },
+  // Clothing
+  { id: 'tf48', czech: 'Kabát', russian: 'Пальто', isCorrect: true, correctRussian: 'Пальто', category: 'clothing' },
+  { id: 'tf49', czech: 'Bunda', russian: 'Рубашка', isCorrect: false, correctRussian: 'Куртка', category: 'clothing' },
+  { id: 'tf50', czech: 'Čepice', russian: 'Шапка', isCorrect: true, correctRussian: 'Шапка', category: 'clothing' },
+  // Home
+  { id: 'tf51', czech: 'Stůl', russian: 'Стол', isCorrect: true, correctRussian: 'Стол', category: 'home' },
+  { id: 'tf52', czech: 'Postel', russian: 'Диван', isCorrect: false, correctRussian: 'Кровать', category: 'home' },
+  { id: 'tf53', czech: 'Lednice', russian: 'Плита', isCorrect: false, correctRussian: 'Холодильник', category: 'home' },
+  // Verbs
+  { id: 'tf54', czech: 'Jíst', russian: 'Есть (кушать)', isCorrect: true, correctRussian: 'Есть (кушать)', category: 'verbs' },
+  { id: 'tf55', czech: 'Číst', russian: 'Писать', isCorrect: false, correctRussian: 'Читать', category: 'verbs' },
+  { id: 'tf56', czech: 'Běžet', russian: 'Бежать', isCorrect: true, correctRussian: 'Бежать', category: 'verbs' },
+  { id: 'tf57', czech: 'Vidět', russian: 'Слышать', isCorrect: false, correctRussian: 'Видеть', category: 'verbs' },
 ];

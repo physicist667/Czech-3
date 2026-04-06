@@ -66,3 +66,27 @@ Rewrite exercises-section.tsx to add category selection before vocabulary-based 
 8. **Imports updated**: Removed `trueFalseQuestions` from exercises.ts import; added `vocabularyData` from vocabulary.ts.
 
 **Build status**: Compiled successfully with no errors.
+
+---
+Task ID: 1
+Agent: Super Z (main)
+Task: Добавить 100 новых чешских слов и обновить упражнения
+
+Work Log:
+- Прочитал текущие файлы: vocabulary.ts, exercises.ts, exercises-section.tsx, czech-store.ts
+- Добавил 5 новых категорий по 20 слов в vocabulary.ts: Животные, Природа и погода, Одежда, Дом и быт, Глаголы и прилагательные
+- Добавил 35 новых вопросов multiple-choice (mc41-mc74) для всех новых категорий + body
+- Добавил 15 новых вопросов fill-blank (fb23-fb37) для новых категорий
+- Добавил 6 новых наборов matching (ms6-ms10) для новых категорий
+- Добавил 22 новых вопроса true-false (tf36-tf57) для новых категорий
+- Добавил 14 новых упражнений sentence-building (sb15-sb28) для новых категорий
+- Обновил czech-store.ts: getTotalWords → 300, добавлены достижения "Полпути!" (200 слов) и "Мастер слов" (300 слов)
+- Обновил all-categories achievement с 8 на 14 префиксов
+- Обновил exercises-section.tsx: динамический подсчёт слов, увеличено количество MC вопросов с 15 до 25
+- Сборка прошла успешно
+
+Stage Summary:
+- Словарь расширен с 200 до 300 слов (14 категорий)
+- Все типы упражнений обновлены для покрытия новых категорий
+- Достижения обновлены для новых целей
+- Файлы: vocabulary.ts, exercises.ts, exercises-section.tsx, czech-store.ts

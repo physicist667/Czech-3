@@ -216,7 +216,7 @@ function CategorySelector({
             </div>
             <div className="flex-1">
               <h3 className="font-bold text-lg">Все слова</h3>
-              <p className="text-sm text-muted-foreground">Все 200 слов из всех категорий</p>
+              <p className="text-sm text-muted-foreground">Все {allWords.length} слов из всех категорий</p>
             </div>
             <Badge variant="secondary" className="text-base font-semibold px-3 py-1">
               {allWords.length}
@@ -1014,7 +1014,7 @@ function TypingPracticeQuiz({
 
 // ===================== MULTIPLE CHOICE (original) =====================
 function MultipleChoiceQuiz({ onFinish }: { onFinish: (score: number, total: number) => void }) {
-  const [questions] = useState(() => shuffleArray(multipleChoiceQuestions).slice(0, 15));
+  const [questions] = useState(() => shuffleArray(multipleChoiceQuestions).slice(0, 25));
   const [currentIdx, setCurrentIdx] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [score, setScore] = useState(0);

@@ -160,9 +160,8 @@ export const useCzechStore = create<CzechStore>()(
         return learnedWordIds.filter((id) => id.startsWith(categoryId[0] === 'g' && categoryId !== 'grammar' ? 'g' : categoryId[0]));
       },
       getTotalWords: () => {
-        // Import vocabulary data to get total count
-        // We'll compute this from the data
-        return 148; // Total words across all categories
+        // 200 words across 9 categories
+        return 200;
       },
       getQuizAccuracy: () => {
         const { quizScores } = get();

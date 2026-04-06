@@ -41,10 +41,15 @@ function FlashCard({ word, onLearned, isLearned }: { word: VocabWord; onLearned:
       >
         <CardContent className="p-5">
           {!isFlipped ? (
-            <div className="text-center space-y-3">
+            <div className="text-center space-y-2">
               <div className="text-2xl font-bold text-emerald-700 dark:text-emerald-400">
                 {word.czech}
               </div>
+              {word.pronunciation && (
+                <div className="text-base text-amber-600 dark:text-amber-400 italic">
+                  [{word.pronunciation}]
+                </div>
+              )}
               <div className="flex items-center justify-center gap-1 text-muted-foreground text-sm">
                 <EyeOff className="size-4" />
                 Нажмите, чтобы увидеть перевод
@@ -334,10 +339,17 @@ export function VocabularySection() {
                     <CardContent className="p-4">
                       <div className="flex items-start justify-between gap-4">
                         <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-3 flex-wrap">
+                          <div className="flex items-center gap-2 flex-wrap">
                             <span className="font-bold text-emerald-700 dark:text-emerald-400">
                               {word.czech}
                             </span>
+                            {word.pronunciation && (
+                              <span className="text-sm text-amber-600 dark:text-amber-400 italic bg-amber-50 dark:bg-amber-950/30 px-1.5 py-0.5 rounded">
+                                {word.pronunciation}
+                              </span>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-2 mt-1">
                             <span className="text-muted-foreground">—</span>
                             <span>{word.russian}</span>
                             {learnedWordIds.includes(word.id) && (

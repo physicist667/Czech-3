@@ -38,13 +38,15 @@ import {
   Sparkles,
   BookOpen,
   RefreshCw,
+  GraduationCap,
 } from 'lucide-react';
+import { GrammarExercisesSection } from '@/components/sections/grammar-exercises-section';
 
-type ExerciseType = 'multiple-choice' | 'fill-blank' | 'matching' | 'sentence-building' | 'flashcards' | 'reverse-quiz' | 'true-false' | 'word-scramble' | 'typing-practice';
+type ExerciseType = 'multiple-choice' | 'fill-blank' | 'matching' | 'sentence-building' | 'flashcards' | 'reverse-quiz' | 'true-false' | 'word-scramble' | 'typing-practice' | 'grammar-exercises';
 
 type SectionStep = 'select-exercise' | 'select-category' | 'playing';
 
-const vocabBasedExercises: ExerciseType[] = ['flashcards', 'reverse-quiz', 'true-false', 'word-scramble', 'typing-practice'];
+const vocabBasedExercises: ExerciseType[] = ['flashcards', 'reverse-quiz', 'true-false', 'word-scramble', 'typing-practice', 'multiple-choice', 'fill-blank', 'matching', 'sentence-building'];
 
 const exerciseTypes: { id: ExerciseType; label: string; icon: React.ReactNode; description: string; isNew?: boolean }[] = [
   { id: 'flashcards', label: 'Флеш-карточки', icon: <Layers className="size-5" />, description: 'Перелистывайте карточки для повторения слов', isNew: true },
@@ -56,6 +58,7 @@ const exerciseTypes: { id: ExerciseType; label: string; icon: React.ReactNode; d
   { id: 'fill-blank', label: 'Заполните пропуск', icon: <PenLine className="size-5" />, description: 'Вставьте правильное слово' },
   { id: 'matching', label: 'Сопоставьте пары', icon: <Link className="size-5" />, description: 'Соедините чешские слова с русскими' },
   { id: 'sentence-building', label: 'Составьте предложение', icon: <ListChecks className="size-5" />, description: 'Расположите слова в правильном порядке' },
+  { id: 'grammar-exercises', label: 'Грамматические упражнения', icon: <GraduationCap className="size-5" />, description: 'Практика грамматических правил чешского языка', isNew: true },
 ];
 
 // ===================== HELPERS =====================
@@ -1012,7 +1015,659 @@ function TypingPracticeQuiz({
   );
 }
 
-// ===================== MULTIPLE CHOICE (original) =====================
+// ===================== VOCAB MULTIPLE CHOICE (dynamic) =====================
+function VocabMultipleChoiceQuiz({
+  words,
+  onFinish,
+  onBack,
+  onNewRound,
+}: {
+  words: VocabWord[];
+  onFinish: (score: number, total: number) => void;
+  onBack: () => void;
+  onNewRound: () => void;
+}) {
+  const [currentIdx, setCurrentIdx] = useState(0);
+  const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
+  const [score, setScore] = useState(0);
+  const [showResult, setShowResult] = useState(false);
+  const [answered, setAnswered] = useState(false);
+
+  const current = words[currentIdx];
+
+  // Generate 4 options: 1 correct Russian translation + 3 wrong from allWords
+  const options = useMemo(() => {
+    const correct = current.russian;
+    const wrongPool = allWords
+      .filter(w => w.russian !== correct && w.czech !== current.czech)
+      .map(w => w.russian);
+    // Deduplicate
+    const uniqueWrong = [...new Set(wrongPool)];
+    const wrongOptions = shuffleArray(uniqueWrong).slice(0, 3);
+    return shuffleArray([correct, ...wrongOptions]);
+  }, [current]);
+
+  const handleAnswer = (answer: string) => {
+    if (answered) return;
+    setSelectedAnswer(answer);
+    setAnswered(true);
+    if (answer === current.russian) {
+      setScore(s => s + 1);
+    }
+  };
+
+  const handleNext = () => {
+    if (currentIdx >= words.length - 1) {
+      setShowResult(true);
+      onFinish(score, words.length);
+    } else {
+      setCurrentIdx(i => i + 1);
+      setSelectedAnswer(null);
+      setAnswered(false);
+    }
+  };
+
+  if (showResult) {
+    return (
+      <ResultsCard
+        score={score}
+        total={words.length}
+        onRetry={() => {
+          setCurrentIdx(0);
+          setSelectedAnswer(null);
+          setScore(0);
+          setShowResult(false);
+          setAnswered(false);
+        }}
+        onNewRound={onNewRound}
+        onBack={onBack}
+      />
+    );
+  }
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <Badge variant="secondary">Вопрос {currentIdx + 1} из {words.length}</Badge>
+        <div className="flex items-center gap-2 text-sm">
+          <span className="text-emerald-600 font-medium">{score}</span>
+          <span className="text-muted-foreground">правильных</span>
+        </div>
+      </div>
+      <Progress value={(currentIdx / words.length) * 100} className="h-2" />
+
+      <Card className="p-6">
+        <div className="text-center mb-6">
+          <p className="text-sm text-muted-foreground mb-1">Переведите на русский:</p>
+          <p className="text-2xl font-bold text-emerald-700 dark:text-emerald-400">{current.czech}</p>
+          <p className="text-sm text-muted-foreground mt-1 italic text-emerald-600 dark:text-emerald-400">[{current.pronunciation}]</p>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {options.map((option) => {
+            const isSelected = selectedAnswer === option;
+            const isCorrect = option === current.russian;
+            let btnClass = 'border hover:bg-muted/50 cursor-pointer';
+            if (answered) {
+              if (isCorrect) btnClass = 'border-emerald-500 bg-emerald-50 dark:bg-emerald-950/50';
+              else if (isSelected && !isCorrect) btnClass = 'border-red-500 bg-red-50 dark:bg-red-950/50';
+              else btnClass = 'border opacity-50';
+            }
+            return (
+              <button
+                key={option}
+                onClick={() => handleAnswer(option)}
+                disabled={answered}
+                className={cn(
+                  'p-4 rounded-lg text-left text-sm font-medium transition-all flex items-center gap-2',
+                  btnClass
+                )}
+              >
+                {answered && isCorrect && <Check className="size-4 text-emerald-600 shrink-0" />}
+                {answered && isSelected && !isCorrect && <X className="size-4 text-red-600 shrink-0" />}
+                {option}
+              </button>
+            );
+          })}
+        </div>
+
+        {answered && (
+          <div className="mt-4 text-center">
+            {selectedAnswer === current.russian ? (
+              <p className="text-emerald-600 font-medium">Правильно! ✅</p>
+            ) : (
+              <p className="text-red-600">
+                Неправильно. Правильный ответ:{' '}
+                <span className="font-bold">{current.russian}</span>
+              </p>
+            )}
+            <Button className="mt-3" onClick={handleNext}>
+              {currentIdx >= words.length - 1 ? 'Показать результат' : 'Следующий вопрос'}
+              <ChevronRight className="size-4 ml-1" />
+            </Button>
+          </div>
+        )}
+      </Card>
+    </div>
+  );
+}
+
+// ===================== VOCAB FILL BLANK (dynamic) =====================
+function VocabFillBlankQuiz({
+  words,
+  onFinish,
+  onBack,
+  onNewRound,
+}: {
+  words: VocabWord[];
+  onFinish: (score: number, total: number) => void;
+  onBack: () => void;
+  onNewRound: () => void;
+}) {
+  const [currentIdx, setCurrentIdx] = useState(0);
+  const [inputValue, setInputValue] = useState('');
+  const [score, setScore] = useState(0);
+  const [showResult, setShowResult] = useState(false);
+  const [answered, setAnswered] = useState(false);
+  const [isCorrect, setIsCorrect] = useState(false);
+  const [showHint, setShowHint] = useState(false);
+
+  const current = words[currentIdx];
+
+  const handleCheck = () => {
+    if (!current || answered) return;
+    const correct = inputValue.trim().toLowerCase() === current.czech.toLowerCase();
+    setIsCorrect(correct);
+    setAnswered(true);
+    if (correct) setScore(s => s + 1);
+  };
+
+  const handleNext = () => {
+    if (currentIdx >= words.length - 1) {
+      setShowResult(true);
+      onFinish(score, words.length);
+    } else {
+      setCurrentIdx(i => i + 1);
+      setInputValue('');
+      setAnswered(false);
+      setIsCorrect(false);
+      setShowHint(false);
+    }
+  };
+
+  // Show hint: reveal first and last letter
+  const getHint = () => {
+    if (!current) return '';
+    const word = current.czech;
+    if (word.length <= 2) return word[0] + '_';
+    return word[0] + '_'.repeat(word.length - 2) + word[word.length - 1];
+  };
+
+  if (showResult) {
+    return (
+      <ResultsCard
+        score={score}
+        total={words.length}
+        onRetry={() => {
+          setCurrentIdx(0);
+          setInputValue('');
+          setScore(0);
+          setShowResult(false);
+          setAnswered(false);
+          setIsCorrect(false);
+          setShowHint(false);
+        }}
+        onNewRound={onNewRound}
+        onBack={onBack}
+      />
+    );
+  }
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <Badge variant="secondary">Слово {currentIdx + 1} из {words.length}</Badge>
+        <div className="flex items-center gap-2 text-sm">
+          <span className="text-emerald-600 font-medium">{score}</span>
+          <span className="text-muted-foreground">правильных</span>
+        </div>
+      </div>
+      <Progress value={(currentIdx / words.length) * 100} className="h-2" />
+
+      <Card className="p-6">
+        <div className="text-center mb-6">
+          <p className="text-sm text-muted-foreground mb-1">Напишите перевод по-чешски:</p>
+          <p className="text-2xl font-bold">{current.russian}</p>
+          {current.example && (
+            <p className="text-xs text-muted-foreground mt-2">
+              Пример: <span className="italic">&laquo;{current.example}&raquo;</span>
+            </p>
+          )}
+        </div>
+
+        {!answered ? (
+          <div className="space-y-4">
+            <div className="relative">
+              <input
+                type="text"
+                value={inputValue}
+                onChange={(e) => setInputValue(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && inputValue.trim()) handleCheck();
+                }}
+                placeholder="Введите чешское слово..."
+                className={cn(
+                  'w-full p-4 rounded-lg border-2 text-lg font-medium text-center',
+                  'focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500',
+                  'bg-background placeholder:text-muted-foreground'
+                )}
+                autoFocus
+                autoComplete="off"
+                autoCorrect="off"
+                autoCapitalize="off"
+                spellCheck={false}
+              />
+            </div>
+
+            <div className="flex flex-col items-center gap-3">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowHint(!showHint)}
+                className="text-muted-foreground"
+              >
+                💡 Подсказка
+              </Button>
+              {showHint && (
+                <motion.p
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="text-sm font-mono tracking-widest text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/50 px-4 py-2 rounded-lg"
+                >
+                  {getHint()}
+                </motion.p>
+              )}
+
+              <Button
+                onClick={handleCheck}
+                disabled={!inputValue.trim()}
+                className="min-w-[200px]"
+              >
+                <Check className="size-4 mr-1" />
+                Проверить
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <div className="text-center space-y-3">
+            <div className={cn(
+              'inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium',
+              isCorrect
+                ? 'bg-emerald-100 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400'
+                : 'bg-red-100 dark:bg-red-950/50 text-red-700 dark:text-red-400'
+            )}>
+              {isCorrect ? (
+                <><Check className="size-4" /> Правильно!</>
+              ) : (
+                <>
+                  <X className="size-4" />
+                  Ваш ответ: &laquo;{inputValue.trim()}&raquo; — Правильно: <span className="font-bold">{current.czech}</span>
+                </>
+              )}
+            </div>
+            <div>
+              <Button onClick={handleNext}>
+                {currentIdx >= words.length - 1 ? 'Показать результат' : 'Следующее слово'}
+                <ChevronRight className="size-4 ml-1" />
+              </Button>
+            </div>
+          </div>
+        )}
+      </Card>
+    </div>
+  );
+}
+
+// ===================== VOCAB MATCHING (dynamic) =====================
+function VocabMatchingQuiz({
+  words: rawWords,
+  onFinish,
+  onBack,
+  onNewRound,
+}: {
+  words: VocabWord[];
+  onFinish: (score: number, total: number) => void;
+  onBack: () => void;
+  onNewRound: () => void;
+}) {
+  // Take up to 8 words
+  const gameWords = useMemo(() => rawWords.slice(0, 8), [rawWords]);
+
+  const [selectedCzech, setSelectedCzech] = useState<string | null>(null);
+  const [matches, setMatches] = useState<Record<string, string>>({});
+  const [wrongAttempts, setWrongAttempts] = useState<Set<string>>(new Set());
+  const [finished, setFinished] = useState(false);
+  const [finalScore, setFinalScore] = useState(0);
+
+  const shuffledCzech = useMemo(() => shuffleArray(gameWords.map(w => w.czech)), [gameWords]);
+  const shuffledRussian = useMemo(() => shuffleArray(gameWords.map(w => w.russian)), [gameWords]);
+
+  const matchedCount = Object.keys(matches).length;
+
+  const handleCzechClick = (czech: string) => {
+    if (matches[czech]) return;
+    setSelectedCzech(czech === selectedCzech ? null : czech);
+  };
+
+  const handleRussianClick = (russian: string) => {
+    if (!selectedCzech) return;
+    const word = gameWords.find(w => w.czech === selectedCzech);
+    if (word && word.russian === russian) {
+      const newMatches = { ...matches, [selectedCzech]: russian };
+      setMatches(newMatches);
+      const newScore = Object.keys(newMatches).length;
+      setWrongAttempts(prev => {
+        const next = new Set(prev);
+        next.delete(selectedCzech);
+        return next;
+      });
+      if (newScore === gameWords.length) {
+        setFinalScore(newScore);
+        setFinished(true);
+        onFinish(newScore, gameWords.length);
+      }
+    } else {
+      setWrongAttempts(prev => new Set(prev).add(selectedCzech));
+    }
+    setSelectedCzech(null);
+  };
+
+  if (finished) {
+    return (
+      <ResultsCard
+        score={finalScore}
+        total={gameWords.length}
+        onRetry={() => {
+          setSelectedCzech(null);
+          setMatches({});
+          setWrongAttempts(new Set());
+          setFinished(false);
+          setFinalScore(0);
+        }}
+        onNewRound={onNewRound}
+        onBack={onBack}
+      />
+    );
+  }
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <Badge variant="secondary">Сопоставление</Badge>
+        <div className="text-sm text-muted-foreground">
+          {matchedCount} из {gameWords.length} пар
+        </div>
+      </div>
+      <Progress value={(matchedCount / gameWords.length) * 100} className="h-2" />
+
+      <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <p className="text-sm font-medium text-center mb-2 text-emerald-700 dark:text-emerald-400">Чешский</p>
+          {shuffledCzech.map((czech) => {
+            const isMatched = !!matches[czech];
+            const isSelected = selectedCzech === czech;
+            const isWrong = wrongAttempts.has(czech);
+            return (
+              <button
+                key={czech}
+                onClick={() => handleCzechClick(czech)}
+                disabled={isMatched}
+                className={cn(
+                  'w-full p-3 rounded-lg text-left text-sm font-medium transition-all border',
+                  isMatched && 'border-emerald-400 bg-emerald-50 dark:bg-emerald-950/50 opacity-60',
+                  isSelected && 'border-emerald-500 bg-emerald-100 dark:bg-emerald-900/50 ring-2 ring-emerald-500',
+                  isWrong && !isMatched && 'border-red-400 bg-red-50 dark:bg-red-950/50',
+                  !isMatched && !isSelected && !isWrong && 'hover:bg-muted/50 cursor-pointer'
+                )}
+              >
+                {czech}
+              </button>
+            );
+          })}
+        </div>
+
+        <div className="space-y-2">
+          <p className="text-sm font-medium text-center mb-2">Русский</p>
+          {shuffledRussian.map((russian) => {
+            const isUsed = Object.values(matches).includes(russian);
+            return (
+              <button
+                key={russian}
+                onClick={() => handleRussianClick(russian)}
+                disabled={isUsed || !selectedCzech}
+                className={cn(
+                  'w-full p-3 rounded-lg text-left text-sm font-medium transition-all border',
+                  isUsed && 'border-emerald-400 bg-emerald-50 dark:bg-emerald-950/50 opacity-60',
+                  !isUsed && selectedCzech && 'hover:bg-muted/50 cursor-pointer',
+                  !selectedCzech && 'opacity-50'
+                )}
+              >
+                {russian}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {!selectedCzech && (
+        <p className="text-center text-sm text-muted-foreground">
+          Выберите чешское слово, затем выберите соответствующий русский перевод
+        </p>
+      )}
+    </div>
+  );
+}
+
+// ===================== VOCAB SENTENCE BUILDING (dynamic) =====================
+interface VocabSentenceQuestion {
+  czechSentence: string;
+  translation: string;
+  shuffledWords: string[];
+}
+
+function generateVocabSentenceQuestions(words: VocabWord[]): VocabSentenceQuestion[] {
+  // Filter words that have examples
+  const wordsWithExamples = words.filter(w => w.example && w.example.length > 0);
+  return wordsWithExamples.map(word => ({
+    czechSentence: word.example,
+    translation: word.exampleTranslation || word.russian,
+    // Split example into words and shuffle
+    shuffledWords: shuffleArray(word.example.split(' ')),
+  }));
+}
+
+function VocabSentenceBuildingQuiz({
+  words: rawWords,
+  onFinish,
+  onBack,
+  onNewRound,
+}: {
+  words: VocabWord[];
+  onFinish: (score: number, total: number) => void;
+  onBack: () => void;
+  onNewRound: () => void;
+}) {
+  const questions = useMemo(() => generateVocabSentenceQuestions(rawWords), [rawWords]);
+  const [currentIdx, setCurrentIdx] = useState(0);
+  const [score, setScore] = useState(0);
+  const [showResult, setShowResult] = useState(false);
+  const [selectedWords, setSelectedWords] = useState<string[]>([]);
+  const [answered, setAnswered] = useState(false);
+  const [isCorrect, setIsCorrect] = useState(false);
+
+  const current = questions[currentIdx];
+
+  const getAvailableWords = () => {
+    if (!current) return [];
+    const counts: Record<string, number> = {};
+    const selCounts: Record<string, number> = {};
+    current.shuffledWords.forEach(w => { counts[w] = (counts[w] || 0) + 1; });
+    selectedWords.forEach(w => { selCounts[w] = (selCounts[w] || 0) + 1; });
+    return current.shuffledWords.filter(w => (counts[w] || 0) > (selCounts[w] || 0));
+  };
+
+  const availableWords = getAvailableWords();
+
+  const handleWordClick = (word: string) => {
+    if (answered) return;
+    setSelectedWords(prev => [...prev, word]);
+  };
+
+  const handleSelectedWordClick = (index: number) => {
+    if (answered) return;
+    setSelectedWords(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const handleCheck = () => {
+    if (!current) return;
+    const joined = selectedWords.join(' ').replace(/\s*([.,!?])\s*/g, '$1');
+    const correct = current.czechSentence.replace(/\s*([.,!?])\s*/g, '$1');
+    const match = joined === correct;
+    setIsCorrect(match);
+    setAnswered(true);
+    if (match) setScore(s => s + 1);
+  };
+
+  const handleNext = () => {
+    if (currentIdx >= questions.length - 1) {
+      setShowResult(true);
+      onFinish(score, questions.length);
+    } else {
+      setCurrentIdx(i => i + 1);
+      setSelectedWords([]);
+      setAnswered(false);
+      setIsCorrect(false);
+    }
+  };
+
+  if (questions.length === 0) {
+    return (
+      <Card className="p-8 text-center">
+        <p className="text-lg text-muted-foreground">Нет слов с примерами предложений в выбранной категории.</p>
+        <Button className="mt-4" onClick={onNewRound}>
+          <RefreshCw className="size-4 mr-1" />
+          Выбрать другую категорию
+        </Button>
+      </Card>
+    );
+  }
+
+  if (showResult) {
+    return (
+      <ResultsCard
+        score={score}
+        total={questions.length}
+        onRetry={() => {
+          setCurrentIdx(0);
+          setScore(0);
+          setShowResult(false);
+          setSelectedWords([]);
+          setAnswered(false);
+          setIsCorrect(false);
+        }}
+        onNewRound={onNewRound}
+        onBack={onBack}
+      />
+    );
+  }
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <Badge variant="secondary">Предложение {currentIdx + 1} из {questions.length}</Badge>
+        <div className="flex items-center gap-2 text-sm">
+          <span className="text-emerald-600 font-medium">{score}</span>
+          <span className="text-muted-foreground">правильных</span>
+        </div>
+      </div>
+      <Progress value={(currentIdx / questions.length) * 100} className="h-2" />
+
+      <Card className="p-6">
+        <div className="text-center mb-4">
+          <p className="text-sm text-muted-foreground mb-1">Перевод:</p>
+          <p className="text-lg font-medium">{current.translation}</p>
+        </div>
+
+        <div className="min-h-[60px] border-2 border-dashed rounded-lg p-3 mb-4 flex flex-wrap gap-2 items-center">
+          {selectedWords.length === 0 ? (
+            <p className="text-sm text-muted-foreground w-full text-center">
+              Нажимайте на слова ниже, чтобы составить предложение
+            </p>
+          ) : (
+            selectedWords.map((word, i) => (
+              <button
+                key={`sel-${word}-${i}`}
+                onClick={() => handleSelectedWordClick(i)}
+                className={cn(
+                  'px-3 py-1.5 rounded-md text-sm font-medium border transition-all',
+                  answered
+                    ? 'border-emerald-300 bg-emerald-50 dark:bg-emerald-950/50'
+                    : 'border-emerald-400 bg-emerald-100 dark:bg-emerald-900/50 hover:bg-emerald-200 dark:hover:bg-emerald-800/50 cursor-pointer'
+                )}
+              >
+                {word}
+              </button>
+            ))
+          )}
+        </div>
+
+        <div className="flex flex-wrap gap-2 justify-center mb-4">
+          {availableWords.map((word, i) => (
+            <button
+              key={`avail-${word}-${i}`}
+              onClick={() => handleWordClick(word)}
+              disabled={answered}
+              className="px-3 py-1.5 rounded-md text-sm font-medium border border-muted hover:bg-muted/50 cursor-pointer transition-all"
+            >
+              {word}
+            </button>
+          ))}
+        </div>
+
+        {!answered && selectedWords.length > 0 && (
+          <div className="text-center">
+            <Button onClick={handleCheck}>
+              <Check className="size-4 mr-1" />
+              Проверить
+            </Button>
+          </div>
+        )}
+
+        {answered && (
+          <div className="text-center space-y-3">
+            {isCorrect ? (
+              <p className="text-emerald-600 font-medium">Правильно! ✅</p>
+            ) : (
+              <div>
+                <p className="text-red-600 mb-1">Неправильно ❌</p>
+                <p className="text-sm">
+                  Правильный ответ:{' '}
+                  <span className="font-bold text-emerald-700 dark:text-emerald-400">{current.czechSentence}</span>
+                </p>
+              </div>
+            )}
+            <Button onClick={handleNext}>
+              {currentIdx >= questions.length - 1 ? 'Показать результат' : 'Следующее'}
+              <ChevronRight className="size-4 ml-1" />
+            </Button>
+          </div>
+        )}
+      </Card>
+    </div>
+  );
+}
+
+// ===================== MULTIPLE CHOICE (original fallback) =====================
 function MultipleChoiceQuiz({ onFinish }: { onFinish: (score: number, total: number) => void }) {
   const [questions] = useState(() => shuffleArray(multipleChoiceQuestions).slice(0, 25));
   const [currentIdx, setCurrentIdx] = useState(0);
@@ -1690,18 +2345,57 @@ export function ExercisesSection() {
               />
             )}
 
-            {/* Classic exercises (no category selection needed) */}
-            {selectedType === 'multiple-choice' && (
+            {/* Dynamic vocab versions for classic exercises (when selectedWords exists) */}
+            {selectedType === 'multiple-choice' && selectedWords && (
+              <VocabMultipleChoiceQuiz
+                words={selectedWords}
+                onFinish={handleFinish('multiple-choice')}
+                onBack={handleBackToCategories}
+                onNewRound={handleNewRound}
+              />
+            )}
+            {selectedType === 'fill-blank' && selectedWords && (
+              <VocabFillBlankQuiz
+                words={selectedWords}
+                onFinish={handleFinish('fill-blank')}
+                onBack={handleBackToCategories}
+                onNewRound={handleNewRound}
+              />
+            )}
+            {selectedType === 'matching' && selectedWords && (
+              <VocabMatchingQuiz
+                words={selectedWords}
+                onFinish={handleFinish('matching')}
+                onBack={handleBackToCategories}
+                onNewRound={handleNewRound}
+              />
+            )}
+            {selectedType === 'sentence-building' && selectedWords && (
+              <VocabSentenceBuildingQuiz
+                words={selectedWords}
+                onFinish={handleFinish('sentence-building')}
+                onBack={handleBackToCategories}
+                onNewRound={handleNewRound}
+              />
+            )}
+
+            {/* Fallback to static versions when no selectedWords */}
+            {selectedType === 'multiple-choice' && !selectedWords && (
               <MultipleChoiceQuiz onFinish={handleFinish('multiple-choice')} />
             )}
-            {selectedType === 'fill-blank' && (
+            {selectedType === 'fill-blank' && !selectedWords && (
               <FillBlankQuiz onFinish={handleFinish('fill-blank')} />
             )}
-            {selectedType === 'matching' && (
+            {selectedType === 'matching' && !selectedWords && (
               <MatchingExercise onFinish={handleFinish('matching')} />
             )}
-            {selectedType === 'sentence-building' && (
+            {selectedType === 'sentence-building' && !selectedWords && (
               <SentenceBuildingQuiz onFinish={handleFinish('sentence-building')} />
+            )}
+
+            {/* Grammar exercises (self-contained component) */}
+            {selectedType === 'grammar-exercises' && (
+              <GrammarExercisesSection />
             )}
           </motion.div>
         </AnimatePresence>

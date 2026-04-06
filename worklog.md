@@ -624,3 +624,63 @@ Stage Summary:
 - Fruits: 2 entries — Hroznové víno, Brukvová
 - Travel: 3 entries — Muzeum, Hraniční přechod, Pamětní předmět
 - Abstract: 1 entry — Porce
+---
+## Task ID: 1 - grammar-exercises
+### Work Task
+Create grammar exercise data file and grammar exercises component for a Czech language learning app for Russian speakers.
+
+### Work Summary
+Created three deliverables:
+
+1. **`/src/data/grammarExercises.ts`** — Data file with:
+   - `GrammarExerciseQuestion` and `GrammarExerciseSet` interfaces
+   - 6 exercise sets with 10 questions each (60 total questions), levels B1–B2:
+     * **Падежные окончания** (case-endings, B1) — choose correct case ending for nouns across all 7 cases
+     * **Правильный предлог** (correct-preposition, B1) — choose correct preposition for a given case/situation (v/na/do/z/k/s/o/pro)
+     * **Склонение прилагательных** (adjective-declension, B1) — choose correct adjective form to agree with noun (Nom/Acc/Gen/Dat/Loc/Ins, sg/pl)
+     * **Спряжение глаголов** (verb-conjugation, B1) — choose correct verb form (present/past/future/imperative)
+     * **Возвратные глаголы** (reflexive-verbs, B1) — choose between se/si or decide if reflexive needed
+     * **Условное наклонение** (conditional-mood, B2) — complete conditional sentences with correct form (by/aby/kdyby)
+   - Each question has: id, type, question (Russian), sentence (Czech with blank), correctAnswer, 4 options, hint, explanation, grammarTopic, difficulty
+   - Questions progressively harder within each set
+   - Detailed Russian-language hints and explanations
+
+2. **`/src/components/sections/grammar-exercises-section.tsx`** — Component with:
+   - `SetSelector` — grid of exercise sets grouped by B1/B2 level with emerald/amber color scheme
+   - `GrammarQuiz` — quiz flow with question, 4 option buttons, hint toggle, correct/incorrect feedback with explanation
+   - `GrammarResultsCard` — final score with retry/new round/back buttons
+   - Progress bar, question counter, score counter
+   - Framer-motion animations (AnimatePresence, fade/slide)
+   - Emerald color scheme matching existing app design
+   - 'use client' directive
+
+3. **Modified `/src/components/sections/exercises-section.tsx`**:
+   - Added `'grammar-exercises'` to `ExerciseType` union
+   - Added `GraduationCap` to lucide-react imports
+   - Added import for `GrammarExercisesSection`
+   - Added grammar-exercises entry to `exerciseTypes` array with isNew: true
+   - Added `{selectedType === 'grammar-exercises' && <GrammarExercisesSection />}` case in playing screen
+
+**Verification**: `npx tsc --noEmit` passes with zero errors in new files (pre-existing errors only in pronounDeclensions.ts).
+---
+Task ID: 1
+Agent: main
+Task: Дополнить грамматику до B2, адаптировать упражнения, создать грамматические упражнения
+
+Work Log:
+- Исследовал структуру проекта (grammar.ts, exercises.ts, exercises-section.tsx, store)
+- Запустил параллельные подзадачи для добавления уроков и создания упражнений
+- Добавил 12 новых уроков грамматики B1-B2 (lesson13-lesson24) в grammar.ts
+- Создал /src/data/grammarExercises.ts с 6 наборами упражнений (60 вопросов)
+- Создал /src/components/sections/grammar-exercises-section.tsx компонент
+- Интегрировал грамматические упражнения в exercises-section.tsx
+- Адаптировал 4 классических упражнения (multiple-choice, fill-blank, matching, sentence-building) для работы с категориями слов
+- Создал 4 новых динамических компонента: VocabMultipleChoiceQuiz, VocabFillBlankQuiz, VocabMatchingQuiz, VocabSentenceBuildingQuiz
+- Проверил сборку — нет новых ошибок TypeScript
+
+Stage Summary:
+- Грамматика расширена до B2: 24 урока (12 A1-A2 + 12 B1-B2)
+- Новые темы: местоимения, предлоги, возвратные глаголы, модальные глаголы, сравнения, условные, страдательный залог, причастия, союзы, числительные, косвенная речь, относительные местоимения
+- 6 наборов грамматических упражнений (60 вопросов): падежи, предлоги, прилагательные, глаголы, возвратные, условное наклонение
+- Все 9 упражнений теперь поддерживают выбор категории слов
+

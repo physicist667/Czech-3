@@ -152,3 +152,51 @@ Created three deliverables:
    - ChevronDown rotation animation on toggle
 
 **Build status**: Compiled successfully with no errors.
+
+---
+## Task ID: 1 - noun-declensions
+### Work Task
+Create noun declension (склонение по падежам) tables for a Czech language learning app for Russian speakers: data file with accurate Czech declensions, table component, and integration into the vocabulary section.
+
+### Work Summary
+Created three deliverables:
+
+1. **`/src/data/nounDeclensions.ts`** — Data file with:
+   - `NounDeclension` interface with wordId, czech, russian, gender (masculine/feminine/neuter/adjective), isAnimate, singular/plural forms (7 cases), pronunciations, optional notes, isPluralOnly flag
+   - `caseLabels` array with 7 Czech cases (Nominativ → Instrumentál) with Russian names and question words
+   - `declensionCategories` array grouping declensions by category (8 categories)
+   - `categoryIdsWithDeclensions` Set for quick category lookup
+   - `getDeclensionsForCategory()` helper function
+   - Accurate declension data for **79 words** across 8 categories:
+     * Семья (family): 17 words (fm1-fm15, fm20-fm21) — includes plural-only forms for Rodiče, Prarodiče
+     * Еда и напитки (food): 20 words (f1-f20) — includes indeclinable Džus, irregular Sůl
+     * Транспорт (transport): 14 words (t1-t14, t18-t19) — includes indeclinable Taxi, -í-ending nouns
+     * В городе (city): 18 words (ct1, ct3-ct12, ct14-ct20) — includes foreign words Museum, Kino
+     * Тело и здоровье (body): 15 words (bd1-bd14, bd16) — includes plural-only Ústa/Vlasy, irregular pairs Oči/Oko, Ucho/Uši
+     * Животные (animals): 4 words (an1-an4)
+     * Работа и профессии (professions): 7 words (pr1-pr5, pr7, pr10-pr11)
+     * Цвета (colors): 9 adjectives (c1-c7, c9-c10) — masculine singular forms only with note about gender agreement
+
+2. **`/src/components/sections/noun-declension-table.tsx`** — Reusable table component:
+   - Compact Card-based layout using shadcn Table components
+   - Emerald color scheme matching the app design
+   - Header shows Czech word + Russian translation + gender badge (м.р./ж.р./ср.р./прил.) + animate badge + plural-only badge
+   - Column headers: Падеж (with Czech name + question), Единственное, Множественное
+   - Adjectives show only masculine singular column with appropriate header
+   - Plural-only words hide singular column
+   - Pronunciation in amber italic under each form (matching VerbConjugationTable pattern)
+   - AlertTriangle icon with notes for special cases (indeclinable words, adjectives)
+   - Mobile responsive (horizontal scroll via overflow-x-auto)
+
+3. **Modified `/src/components/sections/vocabulary-section.tsx`**:
+   - Added imports for `getDeclensionsForCategory`, `categoryIdsWithDeclensions`, `NounDeclensionTable`, `GraduationCap` icon
+   - Added `showDeclensions` state
+   - Added `hasDeclensions` computed boolean (checks Set) and `currentDeclensions` computed array
+   - Added "Таблицы склонений" toggle button with GraduationCap icon and word count badge
+   - Button appears for all 8 categories with declension data (family, food, transport, city, body, animals, professions, colors)
+   - Animated expand/collapse with framer-motion matching verb conjugation pattern
+   - 2-column grid on desktop (lg:grid-cols-2), 1-column on mobile
+   - Staggered animation for each table (delay: idx * 0.04)
+   - Max height 800px with scrollable overflow
+
+**Build status**: Dev server compiles successfully with no errors in new files.

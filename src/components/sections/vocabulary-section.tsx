@@ -12,6 +12,8 @@ import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 import { verbConjugations } from '@/data/verbConjugations';
 import { VerbConjugationTable } from '@/components/sections/verb-conjugation-table';
+import { getDeclensionsForCategory, categoryIdsWithDeclensions } from '@/data/nounDeclensions';
+import { NounDeclensionTable } from '@/components/sections/noun-declension-table';
 import {
   Search,
   ChevronLeft,
@@ -24,6 +26,7 @@ import {
   Filter,
   Table,
   ChevronDown,
+  GraduationCap,
 } from 'lucide-react';
 
 function FlashCard({ word, onLearned, isLearned }: { word: VocabWord; onLearned: () => void; isLearned: boolean }) {
@@ -102,6 +105,10 @@ export function VocabularySection() {
   const [flashcardMode, setFlashcardMode] = useState(false);
   const [showLearned, setShowLearned] = useState(true);
   const [showConjugations, setShowConjugations] = useState(false);
+  const [showDeclensions, setShowDeclensions] = useState(false);
+
+  const hasDeclensions = selectedCategory ? categoryIdsWithDeclensions.has(selectedCategory) : false;
+  const currentDeclensions = selectedCategory ? getDeclensionsForCategory(selectedCategory) : [];
   const { learnedWordIds, toggleWordLearned } = useCzechStore();
 
   const filteredCategories = useMemo(() => {
@@ -275,6 +282,65 @@ export function VocabularySection() {
               <Progress value={totalInCategory > 0 ? (learnedInCategory / totalInCategory) * 100 : 0} className="h-2" />
             </CardContent>
           </Card>
+
+          {/* Noun Declension Tables — for noun categories */}
+          {hasDeclensions && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <Button
+                variant="outline"
+                className={cn(
+                  'w-full justify-between border-emerald-200 dark:border-emerald-800',
+                  showDeclensions && 'bg-emerald-50 dark:bg-emerald-950/30 border-emerald-300 dark:border-emerald-700'
+                )}
+                onClick={() => setShowDeclensions(!showDeclensions)}
+              >
+                <span className="flex items-center gap-2">
+                  <GraduationCap className="size-4 text-emerald-600 dark:text-emerald-400" />
+                  <span className="font-medium">Таблицы склонений</span>
+                  <Badge variant="secondary" className="text-[10px]">
+                    {currentDeclensions.length} слов
+                  </Badge>
+                </span>
+                <motion.div
+                  animate={{ rotate: showDeclensions ? 180 : 0 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <ChevronDown className="size-4" />
+                </motion.div>
+              </Button>
+
+              <AnimatePresence>
+                {showDeclensions && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    exit={{ opacity: 0, height: 0 }}
+                    transition={{ duration: 0.3, ease: 'easeInOut' }}
+                    className="overflow-hidden"
+                  >
+                    <div className="pt-3 max-h-[800px] overflow-y-auto pr-1 space-y-4 custom-scrollbar">
+                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                        {currentDeclensions.map((decl, idx) => (
+                          <motion.div
+                            key={decl.wordId}
+                            initial={{ opacity: 0, y: 15 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: idx * 0.04, duration: 0.3 }}
+                          >
+                            <NounDeclensionTable declension={decl} />
+                          </motion.div>
+                        ))}
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </motion.div>
+          )}
 
           {/* Conjugation Tables Toggle — only for verbs category */}
           {selectedCategory === 'verbs' && (

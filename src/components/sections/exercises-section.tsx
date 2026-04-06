@@ -10,11 +10,10 @@ import {
   fillBlankQuestions,
   matchingSets,
   sentenceBuildingExercises,
-  trueFalseQuestions,
 } from '@/data/exercises';
 import type { MatchingSet } from '@/data/exercises';
-import { allWords } from '@/data/vocabulary';
-import type { VocabWord } from '@/data/vocabulary';
+import { allWords, vocabularyData } from '@/data/vocabulary';
+import type { VocabWord, VocabCategory } from '@/data/vocabulary';
 import { useCzechStore } from '@/store/czech-store';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -37,21 +36,29 @@ import {
   CircleX,
   Keyboard,
   Sparkles,
+  BookOpen,
+  RefreshCw,
 } from 'lucide-react';
 
 type ExerciseType = 'multiple-choice' | 'fill-blank' | 'matching' | 'sentence-building' | 'flashcards' | 'reverse-quiz' | 'true-false' | 'word-scramble' | 'typing-practice';
+
+type SectionStep = 'select-exercise' | 'select-category' | 'playing';
+
+const vocabBasedExercises: ExerciseType[] = ['flashcards', 'reverse-quiz', 'true-false', 'word-scramble', 'typing-practice'];
 
 const exerciseTypes: { id: ExerciseType; label: string; icon: React.ReactNode; description: string; isNew?: boolean }[] = [
   { id: 'flashcards', label: 'Флеш-карточки', icon: <Layers className="size-5" />, description: 'Перелистывайте карточки для повторения слов', isNew: true },
   { id: 'reverse-quiz', label: 'Обратный перевод', icon: <Repeat className="size-5" />, description: 'Выберите чешское слово по русскому переводу', isNew: true },
   { id: 'true-false', label: 'Верно / Неверно', icon: <CircleCheck className="size-5" />, description: 'Быстрый тест: правильно ли переведено слово?', isNew: true },
   { id: 'word-scramble', label: 'Соберите слово', icon: <Shuffle className="size-5" />, description: 'Составьте чешское слово из перемешанных букв', isNew: true },
-  { id: 'typing-practice', label: 'Напишите слово', icon: <Keyboard className="size-5" />, description: 'Введите чешское перевод вручную', isNew: true },
+  { id: 'typing-practice', label: 'Напишите слово', icon: <Keyboard className="size-5" />, description: 'Введите чешский перевод вручную', isNew: true },
   { id: 'multiple-choice', label: 'Выберите перевод', icon: <Target className="size-5" />, description: 'Выберите правильный перевод из 4 вариантов' },
   { id: 'fill-blank', label: 'Заполните пропуск', icon: <PenLine className="size-5" />, description: 'Вставьте правильное слово' },
   { id: 'matching', label: 'Сопоставьте пары', icon: <Link className="size-5" />, description: 'Соедините чешские слова с русскими' },
   { id: 'sentence-building', label: 'Составьте предложение', icon: <ListChecks className="size-5" />, description: 'Расположите слова в правильном порядке' },
 ];
+
+// ===================== HELPERS =====================
 
 function shuffleArray<T>(arr: T[]): T[] {
   const a = [...arr];
@@ -64,12 +71,10 @@ function shuffleArray<T>(arr: T[]): T[] {
 
 function shuffleString(str: string): string[] {
   const letters = str.split('');
-  // Fisher-Yates shuffle
   for (let i = letters.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [letters[i], letters[j]] = [letters[j], letters[i]];
   }
-  // Ensure it's actually shuffled (not the same as original)
   const shuffled = letters.join('');
   if (shuffled === str && str.length > 1) {
     return shuffleString(str);
@@ -84,8 +89,55 @@ function getWrongOptions(correctWord: VocabWord, all: VocabWord[], count: number
   return shuffled.map(w => w.czech);
 }
 
+// Generate True/False questions dynamically from vocabulary words
+interface DynamicTrueFalseQuestion {
+  czech: string;
+  russian: string;
+  isCorrect: boolean;
+  correctRussian: string;
+}
+
+function generateTrueFalseQuestions(words: VocabWord[]): DynamicTrueFalseQuestion[] {
+  const allRussianTranslations = allWords.map(w => w.russian);
+  return words.map(word => {
+    const isCorrect = Math.random() > 0.5;
+    if (isCorrect) {
+      return {
+        czech: word.czech,
+        russian: word.russian,
+        isCorrect: true,
+        correctRussian: word.russian,
+      };
+    } else {
+      // Pick a different russian translation
+      const differentTranslations = allRussianTranslations.filter(r => r !== word.russian);
+      const wrongTranslation = differentTranslations.length > 0
+        ? differentTranslations[Math.floor(Math.random() * differentTranslations.length)]
+        : '—';
+      return {
+        czech: word.czech,
+        russian: wrongTranslation,
+        isCorrect: false,
+        correctRussian: word.russian,
+      };
+    }
+  });
+}
+
 // ===================== RESULTS CARD =====================
-function ResultsCard({ score, total, onRetry }: { score: number; total: number; onRetry: () => void }) {
+function ResultsCard({
+  score,
+  total,
+  onRetry,
+  onNewRound,
+  onBack,
+}: {
+  score: number;
+  total: number;
+  onRetry: () => void;
+  onNewRound: () => void;
+  onBack: () => void;
+}) {
   const pct = Math.round((score / total) * 100);
   return (
     <Card className="p-8 text-center">
@@ -96,18 +148,124 @@ function ResultsCard({ score, total, onRetry }: { score: number; total: number; 
       <p className="text-lg mb-4">
         {score} из {total} правильных ответов ({pct}%)
       </p>
-      <Progress value={pct} className="h-3 mb-4 max-w-xs mx-auto" />
-      <Button onClick={onRetry}>
-        <RotateCcw className="size-4 mr-1" />
-        Попробовать снова
-      </Button>
+      <Progress value={pct} className="h-3 mb-6 max-w-xs mx-auto" />
+      <div className="flex flex-col sm:flex-row gap-3 justify-center">
+        <Button onClick={onRetry}>
+          <RotateCcw className="size-4 mr-1" />
+          Повторить
+        </Button>
+        <Button variant="outline" onClick={onNewRound}>
+          <RefreshCw className="size-4 mr-1" />
+          Новый раунд
+        </Button>
+        <Button variant="ghost" onClick={onBack}>
+          <ChevronLeft className="size-4 mr-1" />
+          Назад
+        </Button>
+      </div>
     </Card>
   );
 }
 
+// ===================== CATEGORY SELECTOR =====================
+function CategorySelector({
+  exerciseType,
+  onSelect,
+  onBack,
+}: {
+  exerciseType: ExerciseType;
+  onSelect: (words: VocabWord[]) => void;
+  onBack: () => void;
+}) {
+  const typeInfo = exerciseTypes.find(t => t.id === exerciseType);
+
+  const handleSelectAll = () => {
+    onSelect(shuffleArray([...allWords]));
+  };
+
+  const handleSelectCategory = (category: VocabCategory) => {
+    onSelect(shuffleArray([...category.words]));
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center gap-3">
+        <Button variant="ghost" size="icon" onClick={onBack}>
+          <ChevronLeft className="size-5" />
+        </Button>
+        <div>
+          <h2 className="text-xl font-bold">{typeInfo?.label}</h2>
+          <p className="text-sm text-muted-foreground">{typeInfo?.description}</p>
+        </div>
+      </div>
+
+      <div>
+        <h3 className="text-sm font-medium text-muted-foreground mb-3 flex items-center gap-2">
+          <BookOpen className="size-4 text-emerald-600" />
+          Выберите категорию слов
+        </h3>
+
+        {/* All words card */}
+        <Card
+          className="cursor-pointer hover:shadow-md transition-all hover:scale-[1.01] p-5 mb-4 border-emerald-300 dark:border-emerald-700 bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-950/30 dark:to-teal-950/30"
+          onClick={handleSelectAll}
+        >
+          <div className="flex items-center gap-4">
+            <div className="p-3 rounded-xl bg-emerald-100 dark:bg-emerald-900 text-emerald-600 text-2xl">
+              📚
+            </div>
+            <div className="flex-1">
+              <h3 className="font-bold text-lg">Все слова</h3>
+              <p className="text-sm text-muted-foreground">Все 200 слов из всех категорий</p>
+            </div>
+            <Badge variant="secondary" className="text-base font-semibold px-3 py-1">
+              {allWords.length}
+            </Badge>
+            <ArrowRight className="size-5 text-muted-foreground shrink-0" />
+          </div>
+        </Card>
+
+        {/* Category grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {vocabularyData.map((category) => (
+            <Card
+              key={category.id}
+              className="cursor-pointer hover:shadow-md transition-all hover:scale-[1.01] p-4"
+              onClick={() => handleSelectCategory(category)}
+            >
+              <div className="flex items-center gap-3">
+                <div className="p-2.5 rounded-lg bg-muted text-2xl">
+                  {category.icon}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-semibold text-sm truncate">{category.name}</h3>
+                  <p className="text-xs text-muted-foreground">{category.words.length} слов</p>
+                </div>
+                <Badge variant="outline" className="text-xs shrink-0">
+                  {category.words.length}
+                </Badge>
+                <ArrowRight className="size-4 text-muted-foreground shrink-0" />
+              </div>
+            </Card>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ===================== FLASHCARDS =====================
-function FlashcardsQuiz({ onFinish }: { onFinish: (score: number, total: number) => void }) {
-  const [words] = useState<VocabWord[]>(() => shuffleArray(allWords).slice(0, 20));
+function FlashcardsQuiz({
+  words,
+  onFinish,
+  onBack,
+  onNewRound,
+}: {
+  words: VocabWord[];
+  onFinish: (score: number, total: number) => void;
+  onBack: () => void;
+  onNewRound: () => void;
+}) {
   const [currentIdx, setCurrentIdx] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
   const [known, setKnown] = useState<number[]>([]);
@@ -145,6 +303,8 @@ function FlashcardsQuiz({ onFinish }: { onFinish: (score: number, total: number)
           setUnknown([]);
           setShowResult(false);
         }}
+        onNewRound={onNewRound}
+        onBack={onBack}
       />
     );
   }
@@ -225,8 +385,17 @@ function FlashcardsQuiz({ onFinish }: { onFinish: (score: number, total: number)
 }
 
 // ===================== REVERSE QUIZ =====================
-function ReverseQuiz({ onFinish }: { onFinish: (score: number, total: number) => void }) {
-  const [words] = useState<VocabWord[]>(() => shuffleArray(allWords).slice(0, 15));
+function ReverseQuiz({
+  words,
+  onFinish,
+  onBack,
+  onNewRound,
+}: {
+  words: VocabWord[];
+  onFinish: (score: number, total: number) => void;
+  onBack: () => void;
+  onNewRound: () => void;
+}) {
   const [currentIdx, setCurrentIdx] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [score, setScore] = useState(0);
@@ -249,7 +418,7 @@ function ReverseQuiz({ onFinish }: { onFinish: (score: number, total: number) =>
   const handleNext = () => {
     if (currentIdx >= words.length - 1) {
       setShowResult(true);
-      onFinish(score + (selectedAnswer === current.czech ? 0 : 0), words.length);
+      onFinish(score, words.length);
     } else {
       setCurrentIdx(i => i + 1);
       setSelectedAnswer(null);
@@ -269,6 +438,8 @@ function ReverseQuiz({ onFinish }: { onFinish: (score: number, total: number) =>
           setShowResult(false);
           setAnswered(false);
         }}
+        onNewRound={onNewRound}
+        onBack={onBack}
       />
     );
   }
@@ -339,9 +510,19 @@ function ReverseQuiz({ onFinish }: { onFinish: (score: number, total: number) =>
   );
 }
 
-// ===================== TRUE / FALSE =====================
-function TrueFalseQuiz({ onFinish }: { onFinish: (score: number, total: number) => void }) {
-  const [questions] = useState(() => shuffleArray(trueFalseQuestions).slice(0, 15));
+// ===================== TRUE / FALSE (dynamic) =====================
+function TrueFalseQuiz({
+  words,
+  onFinish,
+  onBack,
+  onNewRound,
+}: {
+  words: VocabWord[];
+  onFinish: (score: number, total: number) => void;
+  onBack: () => void;
+  onNewRound: () => void;
+}) {
+  const [questions] = useState<DynamicTrueFalseQuestion[]>(() => generateTrueFalseQuestions(words));
   const [currentIdx, setCurrentIdx] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<boolean | null>(null);
   const [score, setScore] = useState(0);
@@ -382,6 +563,8 @@ function TrueFalseQuiz({ onFinish }: { onFinish: (score: number, total: number) 
           setShowResult(false);
           setAnswered(false);
         }}
+        onNewRound={onNewRound}
+        onBack={onBack}
       />
     );
   }
@@ -460,12 +643,19 @@ function TrueFalseQuiz({ onFinish }: { onFinish: (score: number, total: number) 
 }
 
 // ===================== WORD SCRAMBLE =====================
-function WordScrambleQuiz({ onFinish }: { onFinish: (score: number, total: number) => void }) {
-  const [words] = useState<VocabWord[]>(() => {
-    // Filter to words with Czech text that can be scrambled (not too short)
-    const eligible = allWords.filter(w => w.czech.length >= 3 && !w.czech.includes(' '));
-    return shuffleArray(eligible).slice(0, 15);
-  });
+function WordScrambleQuiz({
+  words: rawWords,
+  onFinish,
+  onBack,
+  onNewRound,
+}: {
+  words: VocabWord[];
+  onFinish: (score: number, total: number) => void;
+  onBack: () => void;
+  onNewRound: () => void;
+}) {
+  // Filter out multi-word phrases that can't be scrambled
+  const words = useMemo(() => rawWords.filter(w => !w.czech.includes(' ')), [rawWords]);
   const [currentIdx, setCurrentIdx] = useState(0);
   const [shuffledLetters, setShuffledLetters] = useState<string[]>([]);
   const [selectedLetters, setSelectedLetters] = useState<string[]>([]);
@@ -534,7 +724,21 @@ function WordScrambleQuiz({ onFinish }: { onFinish: (score: number, total: numbe
           setAnswered(false);
           setIsCorrect(false);
         }}
+        onNewRound={onNewRound}
+        onBack={onBack}
       />
+    );
+  }
+
+  if (words.length === 0) {
+    return (
+      <Card className="p-8 text-center">
+        <p className="text-lg text-muted-foreground">Нет подходящих слов для этого упражнения в выбранной категории.</p>
+        <Button className="mt-4" onClick={onNewRound}>
+          <RefreshCw className="size-4 mr-1" />
+          Выбрать другую категорию
+        </Button>
+      </Card>
     );
   }
 
@@ -629,8 +833,17 @@ function WordScrambleQuiz({ onFinish }: { onFinish: (score: number, total: numbe
 }
 
 // ===================== TYPING PRACTICE =====================
-function TypingPracticeQuiz({ onFinish }: { onFinish: (score: number, total: number) => void }) {
-  const [words] = useState<VocabWord[]>(() => shuffleArray(allWords).slice(0, 12));
+function TypingPracticeQuiz({
+  words,
+  onFinish,
+  onBack,
+  onNewRound,
+}: {
+  words: VocabWord[];
+  onFinish: (score: number, total: number) => void;
+  onBack: () => void;
+  onNewRound: () => void;
+}) {
   const [currentIdx, setCurrentIdx] = useState(0);
   const [inputValue, setInputValue] = useState('');
   const [score, setScore] = useState(0);
@@ -687,6 +900,8 @@ function TypingPracticeQuiz({ onFinish }: { onFinish: (score: number, total: num
           setShowHint(false);
           setMistakes(0);
         }}
+        onNewRound={onNewRound}
+        onBack={onBack}
       />
     );
   }
@@ -840,6 +1055,14 @@ function MultipleChoiceQuiz({ onFinish }: { onFinish: (score: number, total: num
           setSelectedAnswer(null);
           setAnswered(false);
         }}
+        onNewRound={() => {
+          setShowResult(false);
+          setCurrentIdx(0);
+          setScore(0);
+          setSelectedAnswer(null);
+          setAnswered(false);
+        }}
+        onBack={() => {}}
       />
     );
   }
@@ -955,6 +1178,14 @@ function FillBlankQuiz({ onFinish }: { onFinish: (score: number, total: number) 
           setSelectedAnswer(null);
           setAnswered(false);
         }}
+        onNewRound={() => {
+          setShowResult(false);
+          setCurrentIdx(0);
+          setScore(0);
+          setSelectedAnswer(null);
+          setAnswered(false);
+        }}
+        onBack={() => {}}
       />
     );
   }
@@ -1229,6 +1460,15 @@ function SentenceBuildingQuiz({ onFinish }: { onFinish: (score: number, total: n
           setAnswered(false);
           setIsCorrect(false);
         }}
+        onNewRound={() => {
+          setShowResult(false);
+          setCurrentIdx(0);
+          setScore(0);
+          setSelectedWords([]);
+          setAnswered(false);
+          setIsCorrect(false);
+        }}
+        onBack={() => {}}
       />
     );
   }
@@ -1321,7 +1561,9 @@ function SentenceBuildingQuiz({ onFinish }: { onFinish: (score: number, total: n
 
 // ===================== MAIN EXERCISES SECTION =====================
 export function ExercisesSection() {
+  const [step, setStep] = useState<SectionStep>('select-exercise');
   const [selectedType, setSelectedType] = useState<ExerciseType | null>(null);
+  const [selectedWords, setSelectedWords] = useState<VocabWord[] | null>(null);
   const { addQuizScore, incrementStreak } = useCzechStore();
 
   const handleFinish = useCallback(
@@ -1338,16 +1580,66 @@ export function ExercisesSection() {
     [addQuizScore, incrementStreak]
   );
 
-  if (selectedType) {
+  const handleExerciseSelect = (type: ExerciseType) => {
+    setSelectedType(type);
+    if (vocabBasedExercises.includes(type)) {
+      setStep('select-category');
+    } else {
+      setStep('playing');
+    }
+  };
+
+  const handleCategorySelect = (words: VocabWord[]) => {
+    setSelectedWords(words);
+    setStep('playing');
+  };
+
+  const handleBackToCategories = useCallback(() => {
+    setSelectedWords(null);
+    setStep('select-category');
+  }, []);
+
+  const handleNewRound = useCallback(() => {
+    setSelectedWords(null);
+    setStep('select-category');
+  }, []);
+
+  const handleBackToExercises = useCallback(() => {
+    setSelectedType(null);
+    setSelectedWords(null);
+    setStep('select-exercise');
+  }, []);
+
+  // Category selection screen
+  if (step === 'select-category' && selectedType) {
+    return (
+      <AnimatePresence mode="wait">
+        <motion.div
+          key="category-select"
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: -20 }}
+        >
+          <CategorySelector
+            exerciseType={selectedType}
+            onSelect={handleCategorySelect}
+            onBack={handleBackToExercises}
+          />
+        </motion.div>
+      </AnimatePresence>
+    );
+  }
+
+  // Playing screen
+  if (step === 'playing' && selectedType) {
+    const typeInfo = exerciseTypes.find((t) => t.id === selectedType);
     return (
       <div className="space-y-4">
         <div className="flex items-center gap-3">
-          <Button variant="ghost" size="icon" onClick={() => setSelectedType(null)}>
+          <Button variant="ghost" size="icon" onClick={handleBackToExercises}>
             <ChevronLeft className="size-5" />
           </Button>
-          <h2 className="text-xl font-bold">
-            {exerciseTypes.find((t) => t.id === selectedType)?.label}
-          </h2>
+          <h2 className="text-xl font-bold">{typeInfo?.label}</h2>
         </div>
         <AnimatePresence mode="wait">
           <motion.div
@@ -1356,6 +1648,49 @@ export function ExercisesSection() {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -20 }}
           >
+            {/* Vocab-based exercises */}
+            {selectedType === 'flashcards' && selectedWords && (
+              <FlashcardsQuiz
+                words={selectedWords}
+                onFinish={handleFinish('flashcards')}
+                onBack={handleBackToCategories}
+                onNewRound={handleNewRound}
+              />
+            )}
+            {selectedType === 'reverse-quiz' && selectedWords && (
+              <ReverseQuiz
+                words={selectedWords}
+                onFinish={handleFinish('reverse-quiz')}
+                onBack={handleBackToCategories}
+                onNewRound={handleNewRound}
+              />
+            )}
+            {selectedType === 'true-false' && selectedWords && (
+              <TrueFalseQuiz
+                words={selectedWords}
+                onFinish={handleFinish('true-false')}
+                onBack={handleBackToCategories}
+                onNewRound={handleNewRound}
+              />
+            )}
+            {selectedType === 'word-scramble' && selectedWords && (
+              <WordScrambleQuiz
+                words={selectedWords}
+                onFinish={handleFinish('word-scramble')}
+                onBack={handleBackToCategories}
+                onNewRound={handleNewRound}
+              />
+            )}
+            {selectedType === 'typing-practice' && selectedWords && (
+              <TypingPracticeQuiz
+                words={selectedWords}
+                onFinish={handleFinish('typing-practice')}
+                onBack={handleBackToCategories}
+                onNewRound={handleNewRound}
+              />
+            )}
+
+            {/* Classic exercises (no category selection needed) */}
             {selectedType === 'multiple-choice' && (
               <MultipleChoiceQuiz onFinish={handleFinish('multiple-choice')} />
             )}
@@ -1368,27 +1703,13 @@ export function ExercisesSection() {
             {selectedType === 'sentence-building' && (
               <SentenceBuildingQuiz onFinish={handleFinish('sentence-building')} />
             )}
-            {selectedType === 'flashcards' && (
-              <FlashcardsQuiz onFinish={handleFinish('flashcards')} />
-            )}
-            {selectedType === 'reverse-quiz' && (
-              <ReverseQuiz onFinish={handleFinish('reverse-quiz')} />
-            )}
-            {selectedType === 'true-false' && (
-              <TrueFalseQuiz onFinish={handleFinish('true-false')} />
-            )}
-            {selectedType === 'word-scramble' && (
-              <WordScrambleQuiz onFinish={handleFinish('word-scramble')} />
-            )}
-            {selectedType === 'typing-practice' && (
-              <TypingPracticeQuiz onFinish={handleFinish('typing-practice')} />
-            )}
           </motion.div>
         </AnimatePresence>
       </div>
     );
   }
 
+  // Exercise type selection screen (default)
   return (
     <div className="space-y-6">
       <div>
@@ -1409,7 +1730,7 @@ export function ExercisesSection() {
             <Card
               key={type.id}
               className="cursor-pointer hover:shadow-md transition-all hover:scale-[1.02] p-6 border-emerald-200 dark:border-emerald-800 bg-gradient-to-br from-emerald-50/50 to-card dark:from-emerald-950/20 dark:to-card"
-              onClick={() => setSelectedType(type.id)}
+              onClick={() => handleExerciseSelect(type.id)}
             >
               <div className="flex items-start gap-4">
                 <div className="p-3 rounded-lg bg-emerald-100 dark:bg-emerald-900 text-emerald-600">
@@ -1437,7 +1758,7 @@ export function ExercisesSection() {
             <Card
               key={type.id}
               className="cursor-pointer hover:shadow-md transition-all hover:scale-[1.02] p-6"
-              onClick={() => setSelectedType(type.id)}
+              onClick={() => handleExerciseSelect(type.id)}
             >
               <div className="flex items-start gap-4">
                 <div className="p-3 rounded-lg bg-emerald-100 dark:bg-emerald-900 text-emerald-600">

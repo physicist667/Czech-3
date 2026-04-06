@@ -10,6 +10,8 @@ import { vocabularyData, type VocabCategory, type VocabWord } from '@/data/vocab
 import { useCzechStore } from '@/store/czech-store';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
+import { verbConjugations } from '@/data/verbConjugations';
+import { VerbConjugationTable } from '@/components/sections/verb-conjugation-table';
 import {
   Search,
   ChevronLeft,
@@ -20,6 +22,8 @@ import {
   BookOpen,
   Check,
   Filter,
+  Table,
+  ChevronDown,
 } from 'lucide-react';
 
 function FlashCard({ word, onLearned, isLearned }: { word: VocabWord; onLearned: () => void; isLearned: boolean }) {
@@ -97,6 +101,7 @@ export function VocabularySection() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [flashcardMode, setFlashcardMode] = useState(false);
   const [showLearned, setShowLearned] = useState(true);
+  const [showConjugations, setShowConjugations] = useState(false);
   const { learnedWordIds, toggleWordLearned } = useCzechStore();
 
   const filteredCategories = useMemo(() => {
@@ -270,6 +275,65 @@ export function VocabularySection() {
               <Progress value={totalInCategory > 0 ? (learnedInCategory / totalInCategory) * 100 : 0} className="h-2" />
             </CardContent>
           </Card>
+
+          {/* Conjugation Tables Toggle — only for verbs category */}
+          {selectedCategory === 'verbs' && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <Button
+                variant="outline"
+                className={cn(
+                  'w-full justify-between border-emerald-200 dark:border-emerald-800',
+                  showConjugations && 'bg-emerald-50 dark:bg-emerald-950/30 border-emerald-300 dark:border-emerald-700'
+                )}
+                onClick={() => setShowConjugations(!showConjugations)}
+              >
+                <span className="flex items-center gap-2">
+                  <Table className="size-4 text-emerald-600 dark:text-emerald-400" />
+                  <span className="font-medium">Таблицы спряжений</span>
+                  <Badge variant="secondary" className="text-[10px]">
+                    15 глаголов
+                  </Badge>
+                </span>
+                <motion.div
+                  animate={{ rotate: showConjugations ? 180 : 0 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <ChevronDown className="size-4" />
+                </motion.div>
+              </Button>
+
+              <AnimatePresence>
+                {showConjugations && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    exit={{ opacity: 0, height: 0 }}
+                    transition={{ duration: 0.3, ease: 'easeInOut' }}
+                    className="overflow-hidden"
+                  >
+                    <div className="pt-3 max-h-[800px] overflow-y-auto pr-1 space-y-4 custom-scrollbar">
+                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                        {verbConjugations.map((verb, idx) => (
+                          <motion.div
+                            key={verb.verbId}
+                            initial={{ opacity: 0, y: 15 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: idx * 0.04, duration: 0.3 }}
+                          >
+                            <VerbConjugationTable verb={verb} />
+                          </motion.div>
+                        ))}
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </motion.div>
+          )}
 
           {/* Flashcard Mode */}
           {flashcardMode ? (

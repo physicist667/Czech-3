@@ -116,3 +116,39 @@ Stage Summary:
 - Все типы упражнений обновлены для новых категорий
 - Общее число слов: 500
 - Сборка прошла успешно
+
+---
+## Task ID: 1 - verb-conjugation
+### Work Task
+Implement verb conjugation table feature for the Czech language learning app: data file, table component, and integration into the vocabulary section.
+
+### Work Summary
+Created three deliverables:
+
+1. **`/src/data/verbConjugations.ts`** — Data file with:
+   - `VerbConjugation` interface and `verbConjugations` array containing all 15 verbs (vb1–vb15)
+   - Each verb has present/past/future conjugations for 6 persons (já, ty, on/ona/ono, my, vy, oni)
+   - Proper handling of perfective verb Koupit (no present tense, shown as "—")
+   - Irregularity notes for Jít, Běžet, Číst, Učit se, Koupit
+   - Exported helper arrays: `personLabels` and `tenseLabels`
+
+2. **`/src/components/sections/verb-conjugation-table.tsx`** — Reusable table component:
+   - Compact Card-based layout using shadcn Table components
+   - Emerald color scheme matching the app design
+   - Header shows Czech verb name + Russian translation + irregularity/perfective badges
+   - Column headers: Лицо, Настоящее (Přítomný), Прошлое (Minulý), Будущее (Budoucí)
+   - Row headers with Russian person names and Czech equivalents
+   - Special styling for perfective verbs (—" in present column)
+   - AlertTriangle icon with notes for irregular verbs
+   - Mobile responsive (horizontal scroll via Table container)
+
+3. **Modified `/src/components/sections/vocabulary-section.tsx`**:
+   - Added `showConjugations` state
+   - Added "Таблицы спряжений" toggle button (only visible when verbs category is selected)
+   - Animated expand/collapse with framer-motion (AnimatePresence + height animation)
+   - 2-column grid on desktop (lg:grid-cols-2), 1-column on mobile
+   - Staggered animation for each table appearing (delay: idx * 0.04)
+   - Max height 800px with scrollable overflow for all 15 tables
+   - ChevronDown rotation animation on toggle
+
+**Build status**: Compiled successfully with no errors.

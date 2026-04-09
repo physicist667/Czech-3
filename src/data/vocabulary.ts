@@ -5311,7 +5311,7 @@ export const vocabularyData: VocabCategory[] = [
       { level: 'B2', id: 'b2-idioms-proverbs22', czech: 'Nést kříž', russian: 'Нести крест, терпеть лишения', pronunciation: 'Нест кшиж', example: 'Po smrti manžela musela nést kříž sama.', exampleTranslation: 'После смерти мужа ей пришлось одной нести этот крест.' },
       { level: 'B2', id: 'b2-idioms-proverbs23', czech: 'Bít se do hlavy', russian: 'Биться головой о стену', pronunciation: 'Бит се до глави', example: 'Nemusíme se bít do hlavy, najdeme řešení.', exampleTranslation: 'Не стоит биться головой о стену, мы найдём решение.' },
       { level: 'B2', id: 'b2-idioms-proverbs24', czech: 'Mít s kým si promluvit', russian: 'Иметь с кем поговорить', pronunciation: 'Мит с кым си промлувит', example: 'Po přestěhování do nového města neměl s kým si promluvit.', exampleTranslation: 'После переезда в новый город ему было не с кем поговорить.' },
-      { level: 'B2', id: 'b2-idioms-proverbs25', czech: 'Přijít k roce', russian: 'Устоять, не сдаваться', pronunciation: 'Прийти к року', example: 'Přes všechny potíže přijdeme k roku.', exampleTranslation: 'Несмотря на все трудности, мы устоим.' },
+      { level: 'B2', id: 'b2-idioms-proverbs25', czech: 'Přijít k roce', russian: 'Устоять, не сдаваться', pronunciation: 'Прийти к roku', example: 'Přes všechny potíže přijdeme k roku.', exampleTranslation: 'Несмотря на все трудности, мы устоим.' },
     ],
   },
 ];

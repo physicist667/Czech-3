@@ -13,6 +13,14 @@ export interface SpecializedPhrase {
   context?: string;
 }
 
+export interface VocabularyGroup {
+  id: string;
+  name: string;
+  icon: string;
+  startIndex: number;
+  endIndex: number;
+}
+
 export interface SpecializedDirection {
   id: string;
   title: string;
@@ -21,4 +29,5 @@ export interface SpecializedDirection {
   description: string;
   vocabulary: SpecializedWord[];
   phrases: SpecializedPhrase[];
+  groups: VocabularyGroup[];
 }

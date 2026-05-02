@@ -215,6 +215,15 @@ export const businessData: SpecializedDirection = {
     { czech: 'převzetí', russian: 'поглощение/передача', pronunciation: 'прэвзэ́ти' },
     { czech: 'kauce', russian: 'залог/депозит', pronunciation: 'ка́уцэ' },
   ],
+  groups: [
+    { id: 'finance-accounting', name: 'Финансы и бухгалтерия', icon: '💰', startIndex: 0, endIndex: 39 },
+    { id: 'marketing', name: 'Маркетинг', icon: '📢', startIndex: 39, endIndex: 68 },
+    { id: 'management', name: 'Менеджмент', icon: '📊', startIndex: 68, endIndex: 98 },
+    { id: 'hr-employment', name: 'Кадры и трудоустройство', icon: '👥', startIndex: 98, endIndex: 123 },
+    { id: 'economics-trade', name: 'Экономика и торговля', icon: '📈', startIndex: 123, endIndex: 159 },
+    { id: 'insurance-banking', name: 'Страхование и банки', icon: '🏦', startIndex: 159, endIndex: 179 },
+    { id: 'corporate-entrepreneurship', name: 'Корпоративное управление', icon: '🏢', startIndex: 179, endIndex: 200 },
+  ],
   phrases: [
     {
       czech: 'Dobrý den, máme sjednanou schůzku v deset hodin.',

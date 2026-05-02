@@ -213,6 +213,13 @@ export const educationData: SpecializedDirection = {
     { czech: 'individuální vzdělávací plán', russian: 'индивидуальный образовательный план', pronunciation: 'индивидуа́лни вздэлава́чи план' },
     { czech: 'beseda', russian: 'беседа (классный час)', pronunciation: 'бэсэ́да' },
   ],
+  groups: [
+    { id: 'school-types-and-levels', name: 'Типы и уровни школ', icon: '🏫', startIndex: 0, endIndex: 40 },
+    { id: 'subjects-and-curriculum', name: 'Предметы и учебные планы', icon: '📚', startIndex: 40, endIndex: 79 },
+    { id: 'teaching-methods', name: 'Методы преподавания', icon: '🎓', startIndex: 79, endIndex: 119 },
+    { id: 'grading-and-exams', name: 'Оценки и экзамены', icon: '📝', startIndex: 119, endIndex: 159 },
+    { id: 'education-administration-and-special-education', name: 'Администрация и спецобразование', icon: '🏛️', startIndex: 159, endIndex: 200 },
+  ],
   phrases: [
     // Teacher-student conversations
     { czech: 'Otevřete učebnice na straně deset.', russian: 'Откройте учебник на странице десять.', pronunciation: 'отэвртэйтэ учэ́бнице на стра́нэ дэсэт.' },

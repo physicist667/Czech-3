@@ -213,6 +213,13 @@ export const transportData: SpecializedDirection = {
     { czech: 'katalyzátor', russian: 'каталитический нейтрализатор', pronunciation: 'катализа́тор' },
     { czech: 'ekologická daň', russian: 'экологический налог', pronunciation: 'эколо́гичка дань' },
   ],
+  groups: [
+    { id: 'vehicles', name: 'Транспортные средства', icon: '🚗', startIndex: 0, endIndex: 39 },
+    { id: 'public-transport-and-infrastructure', name: 'Общественный транспорт', icon: '🚌', startIndex: 39, endIndex: 78 },
+    { id: 'logistics-and-warehousing', name: 'Логистика и склады', icon: '📦', startIndex: 78, endIndex: 119 },
+    { id: 'shipping-and-customs', name: 'Перевозки и таможня', icon: '🚢', startIndex: 119, endIndex: 158 },
+    { id: 'navigation-safety-and-additional-terms', name: 'Навигация и безопасность', icon: '🧭', startIndex: 158, endIndex: 200 },
+  ],
   phrases: [
     // Transport/logistics workplace conversations
     { czech: 'Kde je nejbližší čerpací stanice?', russian: 'Где ближайшая заправочная станция?', pronunciation: 'гдэ йэ нэйближши чэрпа́чи ста́ницэ?' },

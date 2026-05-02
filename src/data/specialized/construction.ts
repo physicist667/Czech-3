@@ -215,6 +215,15 @@ export const constructionData: SpecializedDirection = {
     { czech: 'stavební hrubá stavba', russian: 'строительный короб', pronunciation: 'ставэ́бни гру́ба ставба' },
     { czech: 'zednická lžíce', russian: 'кельма', pronunciation: 'зэдни́цка ли́жицэ' },
   ],
+  groups: [
+    { id: 'building-materials', name: 'Строительные материалы', icon: '🧱', startIndex: 0, endIndex: 30 },
+    { id: 'tools', name: 'Инструменты', icon: '🔧', startIndex: 30, endIndex: 58 },
+    { id: 'construction-processes', name: 'Строительные процессы', icon: '🏗️', startIndex: 58, endIndex: 96 },
+    { id: 'electrical-plumbing', name: 'Электрика и сантехника', icon: '⚡', startIndex: 96, endIndex: 126 },
+    { id: 'architecture-design', name: 'Архитектура и дизайн', icon: '📐', startIndex: 126, endIndex: 146 },
+    { id: 'heavy-machinery-safety', name: 'Техника и безопасность', icon: '🚜', startIndex: 146, endIndex: 175 },
+    { id: 'measurements-finishing', name: 'Замеры и отделка', icon: '📏', startIndex: 175, endIndex: 200 },
+  ],
   phrases: [
     {
       czech: 'Kde je staveniště? Potřebuji mluvit s vedoucím stavby.',

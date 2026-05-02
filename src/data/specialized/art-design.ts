@@ -213,6 +213,13 @@ export const artDesignData: SpecializedDirection = {
     { czech: 'šedá', russian: 'серый', pronunciation: 'шэда́' },
     { czech: 'zlatá', russian: 'золотой', pronunciation: 'зла́та' },
   ],
+  groups: [
+    { id: 'visual-arts-and-techniques', name: 'Изобразительное искусство', icon: '🎨', startIndex: 0, endIndex: 39 },
+    { id: 'graphic-design', name: 'Графический дизайн', icon: '🖌️', startIndex: 39, endIndex: 79 },
+    { id: 'art-history-and-movements', name: 'История искусств', icon: '🖼️', startIndex: 79, endIndex: 120 },
+    { id: 'photography-and-interior-design', name: 'Фотография и дизайн интерьеров', icon: '📸', startIndex: 120, endIndex: 160 },
+    { id: 'fashion-materials-and-colors', name: 'Мода, материалы и цвета', icon: '👗', startIndex: 160, endIndex: 200 },
+  ],
   phrases: [
     // Art discussions
     { czech: 'Jaký je váš oblíbený styl umění?', russian: 'Какой ваш любимый стиль искусства?', pronunciation: 'яки́й йэ ваш обли́бэни сти́л у́мэни?' },

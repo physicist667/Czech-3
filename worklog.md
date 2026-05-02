@@ -1,24 +1,22 @@
 ---
 Task ID: 1
-Agent: Super Z (main)
-Task: Add "Точные науки" (Exact Sciences) with 500 words + 9 other directions with 200 words each
+Agent: Main Agent
+Task: Add word grouping (subcategories) to all specialized dictionaries, create Professions dictionary, update UI
 
 Work Log:
-- Read existing project structure (navigation.tsx, page.tsx, czech-store.ts)
-- Discovered specialized section files didn't exist yet (lost from previous session)
-- Launched 3 parallel agents:
-  - Agent 1: Created data files for directions 1-5 (medicine, IT, business, construction, hospitality) - 200 words each
-  - Agent 2: Created data files for directions 6-10 (exact-sciences 500, law, education, transport, art-design) - 200 words each
-  - Agent 3: Created specialized-section.tsx component + integrated into store/nav/page
-- Fixed index.ts to import from individual direction files (agent 3 had created inline data)
-- Fixed TypeScript type export issues (isolatedModules requires `export type`)
-- Verified build compiles successfully
+- Updated types.ts: added VocabularyGroup interface and groups field to SpecializedDirection
+- Created add-groups.mjs script to automatically extract group boundaries from comment markers
+- Ran script successfully: extracted groups from all 10 dictionary files with Russian translations
+- Fixed injection formatting issues (stray commas) in all dictionary files
+- Created professions.ts: 200 vocabulary words in 9 groups + 10 phrases
+- Updated index.ts: added professions import and VocabularyGroup type export
+- Rewrote specialized-section.tsx UI: added group tabs with "Все слова" default, horizontal scroll, per-group progress
+- Fixed transport.ts stray comma issue
+- Build verified: no errors in project files
 
 Stage Summary:
-- Created 12 files in `/src/data/specialized/` (types.ts + 10 direction files + index.ts)
-- Created `/src/components/sections/specialized-section.tsx` with full UI
-- Updated czech-store.ts, navigation.tsx, page.tsx for integration
-- Total: 2300 vocabulary words across 10 directions
-  - Точные науки (Exact Sciences): 500 words
-  - 9 other directions: 200 words each
-- Build passes successfully
+- All 11 dictionaries now have structured groups with Russian names and emoji icons
+- UI shows "Все слова" tab by default, then group subcategories in horizontal scroll
+- Professions dictionary added as first direction (👔 Профессии)
+- Groups use startIndex/endIndex referencing the flat vocabulary array (backward compatible)
+- Total words across all dictionaries: ~2400+

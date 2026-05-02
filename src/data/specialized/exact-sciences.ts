@@ -548,6 +548,13 @@ export const exactSciencesData: SpecializedDirection = {
     { czech: 'extrakce', russian: 'экстракция', pronunciation: 'экстракцэ' },
     { czech: 'purifikace', russian: 'очистка', pronunciation: 'пурифика́цэ' },
   ],
+  groups: [
+    { id: 'mathematics', name: 'Математика', icon: '🔢', startIndex: 0, endIndex: 90 },
+    { id: 'physics', name: 'Физика', icon: '⚛️', startIndex: 90, endIndex: 185 },
+    { id: 'chemistry', name: 'Химия', icon: '🧪', startIndex: 185, endIndex: 285 },
+    { id: 'biology', name: 'Биология', icon: '🧬', startIndex: 285, endIndex: 390 },
+    { id: 'general-science', name: 'Общие науки', icon: '🔬', startIndex: 390, endIndex: 500 },
+  ],
   phrases: [
     // Scientific discussions
     { czech: 'Jaký je výsledek experimentu?', russian: 'Каков результат эксперимента?', pronunciation: 'яки́й йэ вы́слэдэк эксперимэ́нту?' },

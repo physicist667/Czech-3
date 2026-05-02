@@ -218,6 +218,18 @@ export const itData: SpecializedDirection = {
     { czech: 'chatbot', russian: 'чат-бот', pronunciation: 'чатбот' },
     { czech: 'hluboké učení', russian: 'глубокое обучение', pronunciation: 'глу́боке учэ́ни' },
   ],
+  groups: [
+    { id: 'programming-languages-concepts', name: 'Языки и концепции программирования', icon: '💻', startIndex: 0, endIndex: 25 },
+    { id: 'hardware', name: 'Аппаратное обеспечение', icon: '🖥️', startIndex: 25, endIndex: 45 },
+    { id: 'software-os', name: 'Программное обеспечение и ОС', icon: '💿', startIndex: 45, endIndex: 71 },
+    { id: 'networking', name: 'Сетевые технологии', icon: '🌐', startIndex: 71, endIndex: 91 },
+    { id: 'web-development', name: 'Веб-разработка', icon: '🕸️', startIndex: 91, endIndex: 120 },
+    { id: 'databases', name: 'Базы данных', icon: '🗄️', startIndex: 120, endIndex: 140 },
+    { id: 'mobile-development', name: 'Мобильная разработка', icon: '📱', startIndex: 140, endIndex: 155 },
+    { id: 'cybersecurity', name: 'Кибербезопасность', icon: '🔒', startIndex: 155, endIndex: 175 },
+    { id: 'devops-cloud', name: 'DevOps и облака', icon: '☁️', startIndex: 175, endIndex: 190 },
+    { id: 'ai-ml', name: 'ИИ и машинное обучение', icon: '🤖', startIndex: 190, endIndex: 200 },
+  ],
   phrases: [
     {
       czech: 'Můžete mi prosím pomoci s instalací softwaru?',

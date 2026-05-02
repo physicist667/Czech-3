@@ -215,6 +215,14 @@ export const hospitalityData: SpecializedDirection = {
     { czech: 'bezlepkový', russian: 'безглютеновый', pronunciation: 'бэзлэпко́вы' },
 
   ],
+  groups: [
+    { id: 'hotel', name: 'Гостиница', icon: '🏨', startIndex: 0, endIndex: 35 },
+    { id: 'restaurant-kitchen', name: 'Ресторан и кухня', icon: '🍽️', startIndex: 35, endIndex: 84 },
+    { id: 'tourism-travel', name: 'Туризм и путешествия', icon: '✈️', startIndex: 84, endIndex: 120 },
+    { id: 'customer-service', name: 'Обслуживание клиентов', icon: '🤝', startIndex: 120, endIndex: 148 },
+    { id: 'housekeeping-events', name: 'Обслуживание номеров и мероприятия', icon: '🧹', startIndex: 148, endIndex: 178 },
+    { id: 'restaurant-positions-processes', name: 'Должности и процессы в ресторане', icon: '👨‍🍳', startIndex: 178, endIndex: 200 },
+  ],
   phrases: [
     {
       czech: 'Vítejte v našem hotelu, jak vám mohu pomoci?',

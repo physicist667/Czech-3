@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { useCzechStore } from '@/store/czech-store';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -21,8 +22,9 @@ import {
   GraduationCap,
   ChevronLeft,
   ChevronRight,
+  Layers,
 } from 'lucide-react';
-import { directions, type SpecializedDirection, type SpecializedWord, type SpecializedPhrase } from '@/data/specialized';
+import { directions, type SpecializedDirection, type SpecializedWord, type SpecializedPhrase, type VocabularyGroup } from '@/data/specialized';
 
 const ITEMS_PER_PAGE = 40;
 
@@ -204,6 +206,7 @@ export function SpecializedSection() {
   const [searchQuery, setSearchQuery] = useState('');
   const [filter, setFilter] = useState<'all' | 'new'>('all');
   const [innerTab, setInnerTab] = useState<'dictionary' | 'phrasebook'>('dictionary');
+  const [selectedGroup, setSelectedGroup] = useState<string | null>(null); // null = all words
   const [currentPage, setCurrentPage] = useState(1);
   const { specializedLearnedWordIds, toggleSpecializedWordLearned } = useCzechStore();
 
@@ -212,10 +215,26 @@ export function SpecializedSection() {
     [selectedDirection]
   );
 
-  // Filtered vocabulary
+  // Get words for the selected group (or all words)
+  const activeVocabulary = useMemo(() => {
+    if (!currentDirection) return [];
+    if (!selectedGroup) return currentDirection.vocabulary;
+    const group = currentDirection.groups.find((g) => g.id === selectedGroup);
+    if (!group) return currentDirection.vocabulary;
+    return currentDirection.vocabulary.slice(group.startIndex, group.endIndex);
+  }, [currentDirection, selectedGroup]);
+
+  // Get original indices offset for the selected group
+  const indexOffset = useMemo(() => {
+    if (!currentDirection || !selectedGroup) return 0;
+    const group = currentDirection.groups.find((g) => g.id === selectedGroup);
+    return group?.startIndex ?? 0;
+  }, [currentDirection, selectedGroup]);
+
+  // Filtered vocabulary (search + new filter)
   const filteredVocabulary = useMemo(() => {
     if (!currentDirection) return [];
-    let words = currentDirection.vocabulary;
+    let words = activeVocabulary;
 
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
@@ -228,13 +247,14 @@ export function SpecializedSection() {
     }
 
     if (filter === 'new') {
-      words = words.filter(
-        (_, idx) => !specializedLearnedWordIds.includes(`${currentDirection.id}-${idx}`)
-      );
+      words = words.filter((w) => {
+        const globalIdx = currentDirection.vocabulary.indexOf(w);
+        return !specializedLearnedWordIds.includes(`${currentDirection.id}-${globalIdx}`);
+      });
     }
 
     return words;
-  }, [currentDirection, searchQuery, filter, specializedLearnedWordIds]);
+  }, [currentDirection, activeVocabulary, searchQuery, filter, specializedLearnedWordIds]);
 
   // Filtered phrases
   const filteredPhrases = useMemo(() => {
@@ -261,7 +281,7 @@ export function SpecializedSection() {
     currentPage * ITEMS_PER_PAGE
   );
 
-  // Progress
+  // Progress (always based on total vocabulary, not just selected group)
   const learnedCount = currentDirection
     ? currentDirection.vocabulary.filter((_, idx) =>
         specializedLearnedWordIds.includes(`${currentDirection.id}-${idx}`)
@@ -270,12 +290,31 @@ export function SpecializedSection() {
   const totalWords = currentDirection?.vocabulary.length ?? 0;
   const progressPercent = totalWords > 0 ? Math.round((learnedCount / totalWords) * 100) : 0;
 
+  // Group progress
+  const groupLearnedCount = useMemo(() => {
+    if (!currentDirection || !selectedGroup) return learnedCount;
+    const group = currentDirection.groups.find((g) => g.id === selectedGroup);
+    if (!group) return learnedCount;
+    let count = 0;
+    for (let i = group.startIndex; i < group.endIndex; i++) {
+      if (specializedLearnedWordIds.includes(`${currentDirection.id}-${i}`)) count++;
+    }
+    return count;
+  }, [currentDirection, selectedGroup, specializedLearnedWordIds, learnedCount]);
+
+  const groupTotalWords = useMemo(() => {
+    if (!currentDirection || !selectedGroup) return totalWords;
+    const group = currentDirection.groups.find((g) => g.id === selectedGroup);
+    return group ? group.endIndex - group.startIndex : totalWords;
+  }, [currentDirection, selectedGroup, totalWords]);
+
   // Handlers
   const handleSelectDirection = useCallback((id: string) => {
     setSelectedDirection(id);
     setSearchQuery('');
     setFilter('all');
     setInnerTab('dictionary');
+    setSelectedGroup(null);
     setCurrentPage(1);
   }, []);
 
@@ -283,6 +322,12 @@ export function SpecializedSection() {
     setSelectedDirection(null);
     setSearchQuery('');
     setFilter('all');
+    setSelectedGroup(null);
+    setCurrentPage(1);
+  }, []);
+
+  const handleSelectGroup = useCallback((groupId: string | null) => {
+    setSelectedGroup(groupId);
     setCurrentPage(1);
   }, []);
 
@@ -435,28 +480,102 @@ export function SpecializedSection() {
 
           {/* ─── Dictionary Tab ───────────────────────────────── */}
           <TabsContent value="dictionary" className="space-y-4 mt-4">
+            {/* Group Tabs (horizontal scrollable) */}
+            {currentDirection && currentDirection.groups.length > 0 && (
+              <div className="space-y-3">
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <Layers className="size-4" />
+                  <span>Категории:</span>
+                </div>
+                <ScrollArea className="w-full">
+                  <div className="flex gap-2 pb-2">
+                    {/* All words button */}
+                    <Button
+                      variant={selectedGroup === null ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => handleSelectGroup(null)}
+                      className={cn(
+                        'shrink-0 gap-1.5',
+                        selectedGroup === null && 'bg-emerald-600 hover:bg-emerald-700'
+                      )}
+                    >
+                      Все слова
+                      <Badge variant="secondary" className="ml-1 text-[10px] bg-white/20 text-white border-0">
+                        {totalWords}
+                      </Badge>
+                    </Button>
+                    {/* Group buttons */}
+                    {currentDirection.groups.map((group) => {
+                      const gLearned = (() => {
+                        let count = 0;
+                        for (let i = group.startIndex; i < group.endIndex; i++) {
+                          if (specializedLearnedWordIds.includes(`${currentDirection.id}-${i}`)) count++;
+                        }
+                        return count;
+                      })();
+                      const gTotal = group.endIndex - group.startIndex;
+                      const gProgress = gTotal > 0 ? Math.round((gLearned / gTotal) * 100) : 0;
+
+                      return (
+                        <Button
+                          key={group.id}
+                          variant={selectedGroup === group.id ? 'default' : 'outline'}
+                          size="sm"
+                          onClick={() => handleSelectGroup(group.id)}
+                          className={cn(
+                            'shrink-0 gap-1.5 text-xs sm:text-sm',
+                            selectedGroup === group.id && 'bg-emerald-600 hover:bg-emerald-700'
+                          )}
+                        >
+                          <span>{group.icon}</span>
+                          <span className="hidden sm:inline">{group.name}</span>
+                          <span className="sm:hidden">{group.name.slice(0, 12)}...</span>
+                          <Badge
+                            variant="secondary"
+                            className={cn(
+                              'ml-1 text-[10px]',
+                              selectedGroup === group.id
+                                ? 'bg-white/20 text-white border-0'
+                                : ''
+                            )}
+                          >
+                            {gProgress === 100 ? '✓' : gTotal}
+                          </Badge>
+                        </Button>
+                      );
+                    })}
+                  </div>
+                  <ScrollBar orientation="horizontal" />
+                </ScrollArea>
+              </div>
+            )}
+
             {/* Filters */}
             <div className="flex gap-2">
               <Button
                 variant={filter === 'all' ? 'default' : 'outline'}
                 size="sm"
                 onClick={() => { setFilter('all'); setCurrentPage(1); }}
-                className={filter === 'all' ? 'bg-emerald-600 hover:bg-emerald-700' : ''}
+                className={cn(
+                  filter === 'all' && 'bg-emerald-600 hover:bg-emerald-700'
+                )}
               >
                 Все
                 <Badge variant="secondary" className="ml-1.5 text-[10px]">
-                  {currentDirection?.vocabulary.length}
+                  {activeVocabulary.length}
                 </Badge>
               </Button>
               <Button
                 variant={filter === 'new' ? 'default' : 'outline'}
                 size="sm"
                 onClick={() => { setFilter('new'); setCurrentPage(1); }}
-                className={filter === 'new' ? 'bg-emerald-600 hover:bg-emerald-700' : ''}
+                className={cn(
+                  filter === 'new' && 'bg-emerald-600 hover:bg-emerald-700'
+                )}
               >
                 Новые
                 <Badge variant="secondary" className="ml-1.5 text-[10px]">
-                  {currentDirection ? currentDirection.vocabulary.length - learnedCount : 0}
+                  {activeVocabulary.length - groupLearnedCount}
                 </Badge>
               </Button>
             </div>
@@ -468,11 +587,10 @@ export function SpecializedSection() {
                   variants={container}
                   initial="hidden"
                   animate="show"
-                  key={`page-${currentPage}-${filter}`}
+                  key={`page-${currentPage}-${filter}-${selectedGroup}`}
                   className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3"
                 >
                   {paginatedVocabulary.map((word) => {
-                    // Find the original index in the direction's vocabulary array
                     const origIdx = currentDirection!.vocabulary.indexOf(word);
                     const wordId = `${currentDirection!.id}-${origIdx}`;
                     const isLearned = specializedLearnedWordIds.includes(wordId);

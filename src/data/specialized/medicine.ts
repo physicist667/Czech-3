@@ -217,6 +217,16 @@ export const medicineData: SpecializedDirection = {
     { czech: 'šlachy', russian: 'сухожилия', pronunciation: 'шла́хи' },
     { czech: 'klouby', russian: 'суставы', pronunciation: 'кло́убы' },
   ],
+  groups: [
+    { id: 'body-parts', name: 'Части тела', icon: '🦴', startIndex: 0, endIndex: 30 },
+    { id: 'medical-specialties', name: 'Медицинские специальности', icon: '👨‍⚕️', startIndex: 30, endIndex: 55 },
+    { id: 'diseases-conditions', name: 'Заболевания и состояния', icon: '🦠', startIndex: 55, endIndex: 102 },
+    { id: 'symptoms-signs', name: 'Симптомы и признаки', icon: '🤒', startIndex: 102, endIndex: 117 },
+    { id: 'hospital-departments', name: 'Отделения больницы', icon: '🏥', startIndex: 117, endIndex: 131 },
+    { id: 'medications', name: 'Лекарства', icon: '💊', startIndex: 131, endIndex: 161 },
+    { id: 'medical-equipment-procedures', name: 'Оборудование и процедуры', icon: '🔬', startIndex: 161, endIndex: 187 },
+    { id: 'emergency-patient-care', name: 'Скорая помощь и уход', icon: '🚑', startIndex: 187, endIndex: 200 },
+  ],
   phrases: [
     {
       czech: 'Dobrý den, co vás trápí?',

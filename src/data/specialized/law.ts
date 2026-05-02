@@ -214,6 +214,14 @@ export const lawData: SpecializedDirection = {
     { czech: 'občanství', russian: 'гражданство', pronunciation: 'обчанстви́' },
     { czech: 'azyl', russian: 'убежище', pronunciation: 'ази́л' },
   ],
+  groups: [
+    { id: 'general-legal-terms', name: 'Основные юридические термины', icon: '⚖️', startIndex: 0, endIndex: 40 },
+    { id: 'court-proceedings', name: 'Судебные процессы', icon: '🔨', startIndex: 40, endIndex: 80 },
+    { id: 'criminal-law', name: 'Уголовное право', icon: '👮', startIndex: 80, endIndex: 111 },
+    { id: 'civil-law', name: 'Гражданское право', icon: '📋', startIndex: 111, endIndex: 142 },
+    { id: 'family-law-and-property', name: 'Семейное право и недвижимость', icon: '🏠', startIndex: 142, endIndex: 173 },
+    { id: 'employment-law-and-constitutional-law', name: 'Трудовое и конституционное право', icon: '📜', startIndex: 173, endIndex: 200 },
+  ],
   phrases: [
     // Legal consultations
     { czech: 'Potřebuji právní radu.', russian: 'Мне нужна юридическая консультация.', pronunciation: 'потрэ́буйи пра́вни раду.' },

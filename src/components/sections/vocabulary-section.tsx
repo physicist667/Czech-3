@@ -28,6 +28,7 @@ import {
   ChevronDown,
   GraduationCap,
   Layers,
+  Dumbbell,
 } from 'lucide-react';
 
 function FlashCard({ word, onLearned, isLearned }: { word: VocabWord; onLearned: () => void; isLearned: boolean }) {
@@ -35,8 +36,10 @@ function FlashCard({ word, onLearned, isLearned }: { word: VocabWord; onLearned:
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      exit={{ opacity: 0, scale: 0.95 }}
+      transition={{ duration: 0.15 }}
       className="perspective-1000"
     >
       <Card
@@ -70,6 +73,18 @@ function FlashCard({ word, onLearned, isLearned }: { word: VocabWord; onLearned:
                 <p className="italic text-emerald-700 dark:text-emerald-400 mb-1">{word.example}</p>
                 <p>{word.exampleTranslation}</p>
               </div>
+              {word.synonyms && word.synonyms.length > 0 && (
+                <div className="pt-2 border-t">
+                  <p className="text-xs text-muted-foreground mb-1">Синонимы:</p>
+                  <div className="flex flex-wrap gap-1.5 justify-center">
+                    {word.synonyms.map((s, i) => (
+                      <Badge key={i} variant="secondary" className="text-xs bg-blue-50 dark:bg-blue-950/30 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800">
+                        {s}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+              )}
               <div className="flex items-center justify-center gap-1 text-muted-foreground text-xs">
                 <Eye className="size-3" />
                 Нажмите, чтобы скрыть
@@ -125,7 +140,7 @@ export function VocabularySection() {
 
   const hasDeclensions = selectedCategory ? categoryIdsWithDeclensions.has(selectedCategory) : false;
   const currentDeclensions = selectedCategory ? getDeclensionsForCategory(selectedCategory) : [];
-  const { learnedWordIds, toggleWordLearned } = useCzechStore();
+  const { learnedWordIds, toggleWordLearned, setActiveTab, setExerciseNavigation } = useCzechStore();
 
   // Get unique groups
   const groups = useMemo(() => {
@@ -448,6 +463,25 @@ export function VocabularySection() {
             </div>
           )}
 
+          {/* Go to Exercises Button */}
+          {currentWords.length > 0 && (
+            <Button
+              className="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-medium py-3"
+              onClick={() => {
+                setExerciseNavigation({
+                  words: currentWords,
+                  categoryName: currentCategory?.name || '',
+                  fromVocabulary: true,
+                });
+                setActiveTab('exercises');
+              }}
+            >
+              <Dumbbell className="size-4 mr-2" />
+              Перейти к упражнениям
+              <span className="ml-2 text-sm opacity-80">({currentWords.length} слов)</span>
+            </Button>
+          )}
+
           {/* Progress Bar */}
           <Card>
             <CardContent className="p-4">
@@ -673,6 +707,15 @@ export function VocabularySection() {
                           <p className="text-xs text-muted-foreground mt-0.5">
                             {word.exampleTranslation}
                           </p>
+                          {word.synonyms && word.synonyms.length > 0 && (
+                            <div className="flex flex-wrap gap-1 mt-1.5">
+                              {word.synonyms.map((s, i) => (
+                                <Badge key={i} variant="secondary" className="text-[10px] bg-blue-50 dark:bg-blue-950/30 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800 px-1.5 py-0">
+                                  {s}
+                                </Badge>
+                              ))}
+                            </div>
+                          )}
                         </div>
                         <Button
                           variant="ghost"

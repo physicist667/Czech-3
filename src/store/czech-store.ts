@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import type { VocabWord } from '@/data/vocabulary';
 
 export type TabId = 'dashboard' | 'alphabet' | 'vocabulary' | 'phrasebook' | 'reading' | 'grammar' | 'exercises' | 'specialized' | 'progress';
 
@@ -21,10 +22,21 @@ export interface Achievement {
   unlockedDate?: string;
 }
 
+export interface ExerciseNavigation {
+  words: VocabWord[];
+  categoryName: string;
+  fromVocabulary: boolean;
+}
+
 interface CzechStore {
   // Navigation
   activeTab: TabId;
   setActiveTab: (tab: TabId) => void;
+
+  // Exercise navigation from vocabulary section
+  exerciseNavigation: ExerciseNavigation | null;
+  setExerciseNavigation: (nav: ExerciseNavigation) => void;
+  clearExerciseNavigation: () => void;
 
   // Vocabulary progress
   learnedWordIds: string[];
@@ -90,6 +102,11 @@ export const useCzechStore = create<CzechStore>()(
       // Navigation
       activeTab: 'dashboard',
       setActiveTab: (tab) => set({ activeTab: tab }),
+
+      // Exercise navigation from vocabulary section
+      exerciseNavigation: null,
+      setExerciseNavigation: (nav) => set({ exerciseNavigation: nav }),
+      clearExerciseNavigation: () => set({ exerciseNavigation: null }),
 
       // Vocabulary
       learnedWordIds: [],

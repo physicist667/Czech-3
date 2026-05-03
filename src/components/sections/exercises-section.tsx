@@ -463,6 +463,7 @@ function FlashcardsQuiz({
   const [known, setKnown] = useState<number[]>([]);
   const [unknown, setUnknown] = useState<number[]>([]);
   const [showResult, setShowResult] = useState(false);
+  const [isTransitioning, setIsTransitioning] = useState(false);
 
   const current = words[currentIdx];
   const isDone = currentIdx >= words.length;
@@ -479,7 +480,11 @@ function FlashcardsQuiz({
       setShowResult(true);
       onFinish(finalKnown.length, words.length);
     } else {
-      setCurrentIdx(prev => prev + 1);
+      setIsTransitioning(true);
+      setTimeout(() => {
+        setCurrentIdx(prev => prev + 1);
+        setIsTransitioning(false);
+      }, 150);
     }
   };
 
@@ -518,8 +523,13 @@ function FlashcardsQuiz({
 
       <div
         className="perspective-[1000px] cursor-pointer mx-auto max-w-md"
-        onClick={() => setIsFlipped(!isFlipped)}
+        onClick={() => !isTransitioning && setIsFlipped(!isFlipped)}
       >
+        <motion.div
+          className={cn("relative w-full min-h-[280px]", isTransitioning && "pointer-events-none")}
+          animate={{ opacity: isTransitioning ? 0 : 1 }}
+          transition={{ duration: 0.12 }}
+        >
         <motion.div
           className="relative w-full min-h-[280px]"
           animate={{ rotateY: isFlipped ? 180 : 0 }}
@@ -546,6 +556,7 @@ function FlashcardsQuiz({
             <p className="text-sm text-muted-foreground italic mt-2">&laquo;{current.example}&raquo;</p>
             <p className="text-xs text-muted-foreground mt-1">{current.exampleTranslation}</p>
           </div>
+        </motion.div>
         </motion.div>
       </div>
 
@@ -2408,7 +2419,16 @@ export function ExercisesSection() {
   const [step, setStep] = useState<SectionStep>('select-exercise');
   const [selectedType, setSelectedType] = useState<ExerciseType | null>(null);
   const [selectedWords, setSelectedWords] = useState<VocabWord[] | null>(null);
-  const { addQuizScore, incrementStreak } = useCzechStore();
+  const { addQuizScore, incrementStreak, exerciseNavigation, clearExerciseNavigation } = useCzechStore();
+
+  // Handle navigation from vocabulary section
+  useEffect(() => {
+    if (exerciseNavigation?.fromVocabulary && exerciseNavigation.words.length > 0) {
+      setSelectedWords(shuffleArray([...exerciseNavigation.words]));
+      setStep('select-exercise');
+      clearExerciseNavigation();
+    }
+  }, [exerciseNavigation, clearExerciseNavigation]);
 
   const handleFinish = useCallback(
     (type: ExerciseType) => (score: number, total: number) => {
@@ -2427,7 +2447,12 @@ export function ExercisesSection() {
   const handleExerciseSelect = (type: ExerciseType) => {
     setSelectedType(type);
     if (vocabBasedExercises.includes(type)) {
-      setStep('select-category');
+      // If words are pre-selected (from vocabulary navigation), skip category selection
+      if (selectedWords && selectedWords.length > 0) {
+        setStep('playing');
+      } else {
+        setStep('select-category');
+      }
     } else {
       setStep('playing');
     }
@@ -2601,6 +2626,33 @@ export function ExercisesSection() {
           Выберите тип упражнения для практики
         </p>
       </div>
+
+      {/* Pre-selected words banner (from vocabulary navigation) */}
+      {selectedWords && selectedWords.length > 0 && (
+        <Card className="p-4 border-emerald-300 dark:border-emerald-700 bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-950/30 dark:to-teal-950/30">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-lg bg-emerald-100 dark:bg-emerald-900">
+                <BookOpen className="size-5 text-emerald-600" />
+              </div>
+              <div>
+                <p className="font-medium text-sm">Слова из словаря выбраны</p>
+                <p className="text-xs text-muted-foreground">
+                  {selectedWords.length} слов — нажмите на упражнение, чтобы начать
+                </p>
+              </div>
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setSelectedWords(null)}
+              className="text-xs"
+            >
+              Сбросить
+            </Button>
+          </div>
+        </Card>
+      )}
 
       {/* New exercises */}
       <div>

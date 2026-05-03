@@ -3,8 +3,8 @@ FROM oven/bun:1.1 AS builder
 WORKDIR /app
 
 # Install dependencies (using lockfile for reproducibility)
-COPY package.json bun.lock ./
-RUN bun install --frozen-lockfile
+COPY package.json ./
+RUN bun install
 
 # Generate Prisma client (needed even if unused — db.ts exists)
 COPY prisma ./prisma/

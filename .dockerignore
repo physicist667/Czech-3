@@ -1,0 +1,15 @@
+node_modules
+.next
+.git
+upload
+db
+agent-ctx
+.env
+download
+skills
+mini-services
+examples
+.zscripts
+*.md
+sort_*.py
+Caddyfile

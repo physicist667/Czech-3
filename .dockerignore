@@ -12,5 +12,4 @@ Dockerfile
 .dockerignore
 render.yaml
 README.md
-scripts/
 Caddyfile
